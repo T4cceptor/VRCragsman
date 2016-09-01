@@ -44,7 +44,7 @@ PlattformObject NodeFactory::createPlattform(std::string filePath){
 VRGPhysicsObject NodeFactory::createCave(){
 	// TODO init cave attributes
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
-	NodeRecPtr cave = createNodeFromFile("models/BasicCaveOnly20160815.obj");
+	NodeRecPtr cave = createNodeFromFile("../models/BasicCaveOnly20160815.obj");
 	returnObj.setGeometryNode(cave);
 	// GeometryRecPtr geo = cave->getCore();
 	// GeometryRecPtr geo = dynamic_cast<Geometry *>(scene->getCore());
