@@ -6,6 +6,8 @@ Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 	- Idee: erster Knopfdruck hebt Hook auf
 	- nächster Knopfdruck lässt den Hook wieder los
 		-> Spieler muss Wurfbewegung korrekt ausführen
+	- aktuell: Knopfdruck setzt Anfangspunkt, wenn Knopf wieder losgelassen wird wird Endpunkt gesetzt, daraus wird der Bewegungsrichtung berechnet
+		-> Idee: Geschwindigkeit abhängig von der Zeit zwischen Knopfdruck und Knopf loslassen
 
 - Collisions-Erkennung implementieren für Hook Objekt
 	- Hook kann kollidieren mit:
