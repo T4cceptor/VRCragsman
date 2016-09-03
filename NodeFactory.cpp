@@ -56,8 +56,10 @@ VRGPhysicsObject NodeFactory::createCave(){
 
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();
 	returnObj.setTransformation(compTransform);
-	compTransform->setScale(Vec3f(15,15,15));
-	compTransform->setTranslation(Vec3f(510,0,510));
+
+	// TODO: implement scaling factor
+	compTransform->setScale(Vec3f(300,300,300));
+    compTransform->setTranslation(Vec3f(5100,300,5100));
 
 	// TODO
 	// compTransform->setCenter
@@ -156,6 +158,8 @@ NodeTransitPtr NodeFactory::createNewLight(Pnt3f position, NodeRecPtr root){
 VRGPhysicsObject NodeFactory::createHook(){
 	// TODO init cave attributes
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
+
+	// TODO: auf .obj file umstellen
 	NodeRecPtr hook = createNodeFromFile("models/GoodHookTest.3ds");
 	returnObj.setGeometryNode(hook);
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();

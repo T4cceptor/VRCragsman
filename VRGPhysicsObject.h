@@ -1,5 +1,5 @@
 #pragma once
-#include "vrgobject.h"
+#include "VRGObject.h"
 #include <OSGVector.h>
 
 class VRGPhysicsObject :

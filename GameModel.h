@@ -3,7 +3,7 @@
 #include "PlattformObject.h"
 #include "PhysicsController.h"
 #include <OSGNode.h>
-#include <OpenSG\OSGSimpleGeometry.h>
+#include <OSGSimpleGeometry.h>
 #include "VRGLogger.h"
 #include <OSGVector.h>
 #include <sstream>

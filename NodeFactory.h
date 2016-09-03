@@ -4,6 +4,7 @@
 # pragma warning(push)
 # pragma warning(disable:4251 4275 4290 4996 4231 4244)
 #endif
+
 // OpenSG includes
 #include <OpenSG/OSGGLUT.h>
 #include <OpenSG/OSGConfig.h>
@@ -19,18 +20,20 @@
 #include <OpenSG/OSGGradientBackground.h>
 #include <OpenSG/OSGPointLight.h>
 #include <OpenSG/OSGSpotLight.h>
-#include <ctime>
 #include <OpenSG/OSGNavigator.h>
-#include <iostream>
-#include <math.h>
-#include <OSGTransitPtr.h>
-#include "VRGObject.h"
-#include "VRGPhysicsObject.h"
-#include "PlattformObject.h"
 #include <OpenSG/OSGGeoFunctions.h>
+#include <OSGTransitPtr.h>
 #include <OSGLight.h>
 #include <OSGDirectionalLight.h>
 #include <OSGPointLight.h>
+
+#include <ctime>
+#include <iostream>
+#include <math.h>
+
+#include "VRGObject.h"
+#include "VRGPhysicsObject.h"
+#include "PlattformObject.h"
 #ifdef _MSC_VER
 # pragma warning(pop)
 #endif

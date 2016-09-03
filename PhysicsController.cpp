@@ -1,6 +1,5 @@
 #include "PhysicsController.h"
 #include "VRGLogger.h"
-#include <OpenSG\OSGThreadManager.h>
 
 extern int currentId;
 
@@ -12,10 +11,10 @@ PhysicsController::PhysicsController(void)
 {
 	model = * new PhysicsModel();
 	heightDimension = 1; // 0 = x-axis, 1 = y-axis, 2 = z-axis
-	floorValue = -10000; // TODO: tiefsten Punkt einstellen
-	speed = 0.5; // TODO: Geschwindigkeit richtig einstellen
+	floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
+	speed = 15.5; // TODO: Geschwindigkeit richtig einstellen
 	speedloss = 0.0001; // TODO: Geschwindigkeit verlust richtig einstellen
-	gravity = 0.12; // TODO: Schwerkraft simulieren
+	gravity = 11.12; // TODO: Schwerkraft simulieren
 	minDirectionLengthValue = 0.05; // TODO, ist nicht der richtige Wert !
 	upVector = Vec3f(0,1,0); // je nach Koordinatensystem einstellen
 
@@ -32,7 +31,9 @@ PhysicsController::~PhysicsController(void)
 void PhysicsController::registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable){
 	// TODO
 	// VRGLogger::logMessage("Registered new physic object ");
+
 	if(isMoveable){
+		std::cout << "added new physics object" << std::endl;
 		model.addMoveableObject(obj);
 	}
 }
@@ -78,6 +79,9 @@ void PhysicsController::calculateNewTick(){
 	int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
 	int newTick = int(static_cast<int>(delta) / 25) % 25;
 
+	std::cout << "calculating new tick: " << newTick << std::endl;
+	std::cout << "MovableItems: " << model.getMovableItems().size() << std::endl;
+
 	// Simulates movement
 	if(newTick != tick && !model.getMovableItems().empty()){
 		std::list<VRGPhysicsObject> movObj = model.getMovableItems(); // TODO: Performance upgrade!?
@@ -106,7 +110,7 @@ void PhysicsController::calculateNewTick(){
 			}
 
 			poPtr.setDirection(newDirection[0],newDirection[1],newDirection[2]);
-			if(tick == 0 && false)
+			if(tick == 0)
 				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << now << std::endl;
 
 			// TODO: Rotation 

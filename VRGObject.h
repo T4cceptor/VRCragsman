@@ -1,6 +1,6 @@
 #pragma once
-#include <OpenSG\OSGNode.h>
-#include <OpenSG\OSGComponentTransform.h>
+#include <OSGNode.h>
+#include <OSGComponentTransform.h>
 
 OSG_USING_NAMESPACE
 

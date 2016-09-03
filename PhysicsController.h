@@ -1,7 +1,5 @@
 #pragma once
 #include "PhysicsModel.h"
-#include <OpenSG/OSGThreadManager.h>
-// #include <OSGThread.h>
 #include <thread>
 
 OSG_USING_NAMESPACE // activate the OpenSG namespace
@@ -22,7 +20,7 @@ private:
 	clock_t startTime;
 
 	int heightDimension;
-	int floorValue;
+	double floorValue;
 	float speed;
 	float speedloss;
 	float gravity;
