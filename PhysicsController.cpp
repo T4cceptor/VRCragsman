@@ -1,5 +1,6 @@
 #include "PhysicsController.h"
 #include "VRGLogger.h"
+#include "Config.h"
 
 extern int currentId;
 
@@ -10,13 +11,15 @@ void testFunction(){
 PhysicsController::PhysicsController(void)
 {
 	model = * new PhysicsModel();
-	heightDimension = 1; // 0 = x-axis, 1 = y-axis, 2 = z-axis
-	floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
-	speed = 15.5; // TODO: Geschwindigkeit richtig einstellen
-	speedloss = 0.0001; // TODO: Geschwindigkeit verlust richtig einstellen
-	gravity = 11.12; // TODO: Schwerkraft simulieren
-	minDirectionLengthValue = 0.05; // TODO, ist nicht der richtige Wert !
-	upVector = Vec3f(0,1,0); // je nach Koordinatensystem einstellen
+
+	// Werte in Config.h einstellen
+	heightDimension = physics::heightDimension;
+	floorValue = physics::floorValue * general::scale;
+	speed = physics::speed * general::scale;
+	speedloss = physics::speedloss * general::scale;
+	gravity = physics::gravity * general::scale;
+	minDirectionLengthValue = physics::minDirectionLengthValue * general::scale;
+	upVector = general::upVector;
 
 	tick = 0;
 	time = 0;
@@ -76,11 +79,11 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 void PhysicsController::calculateNewTick(){
 	clock_t now = clock();
 	clock_t delta = now - startTime;
-	int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
+	// int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
 	int newTick = int(static_cast<int>(delta) / 25) % 25;
 
-	std::cout << "calculating new tick: " << newTick << std::endl;
-	std::cout << "MovableItems: " << model.getMovableItems().size() << std::endl;
+	//std::cout << "calculating new tick: " << newTick << std::endl;
+	//std::cout << "MovableItems: " << model.getMovableItems().size() << std::endl;
 
 	// Simulates movement
 	if(newTick != tick && !model.getMovableItems().empty()){
@@ -110,8 +113,8 @@ void PhysicsController::calculateNewTick(){
 			}
 
 			poPtr.setDirection(newDirection[0],newDirection[1],newDirection[2]);
-			if(tick == 0)
-				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << now << std::endl;
+			if(tick == 0 && false)
+				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << tick << std::endl;
 
 			// TODO: Rotation 
 			// ComponentTransformRecPtr t = ComponentTransformRecPtr ((* it).getTransformation());

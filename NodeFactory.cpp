@@ -1,4 +1,5 @@
 #include "NodeFactory.h"
+#include "Config.h"
 
 /* * * * * * * TODO * * * * * * * * *
 - createNode sinnvoll verallgemeinern - ?
@@ -58,8 +59,8 @@ VRGPhysicsObject NodeFactory::createCave(){
 	returnObj.setTransformation(compTransform);
 
 	// TODO: implement scaling factor
-	compTransform->setScale(Vec3f(300,300,300));
-    compTransform->setTranslation(Vec3f(5100,300,5100));
+	compTransform->setScale(cave::scaleVector * general::scale);
+    compTransform->setTranslation(cave::translationVector * general::scale);
 
 	// TODO
 	// compTransform->setCenter

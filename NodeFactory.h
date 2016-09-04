@@ -1,4 +1,4 @@
-#pragma once
+
 //#define SNIPPET_STEP 7
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -6,6 +6,7 @@
 #endif
 
 // OpenSG includes
+#pragma once
 #include <OpenSG/OSGGLUT.h>
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGGLUTWindow.h>
@@ -26,14 +27,13 @@
 #include <OSGLight.h>
 #include <OSGDirectionalLight.h>
 #include <OSGPointLight.h>
-
 #include <ctime>
 #include <iostream>
 #include <math.h>
-
 #include "VRGObject.h"
 #include "VRGPhysicsObject.h"
 #include "PlattformObject.h"
+
 #ifdef _MSC_VER
 # pragma warning(pop)
 #endif

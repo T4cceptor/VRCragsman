@@ -16,9 +16,11 @@ Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 			2) Spieler bewegt sich automatisch auf nächste Plattform
 				-> Idee: Spieler muss Knopf gedrückt halten damit er voran kommt
 		- Cave: Hook wird abgelenkt, kein weiterer Effekt
+
 - Animationen
 	- Pull-In 
 	- Move-To-Next-Plattform
+
 - Rope:
 	- Model einfügen
 	- Physik implementieren:
@@ -26,8 +28,8 @@ Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 			- Idee: Rope folgt Hook
 			- Problem: Wo "entsteht" das Seil und wohin wird es zurück geführt?
 				-> Ideen: "Anker" auf Plattform an dem Seil festhängt
-
-
+				-> Idee: Rope "spawnt" an der wand_position
+				-> Idee: Spieler muss zunächst Rope am Boden befestigen -> Möglichkeit Spieler an gewünschte Stelle in der Cave zu bringen
 
 - Spielzustände implementieren
 
@@ -35,6 +37,18 @@ Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 	- Icicles fallen herab, Spieler muss diesen auszuweichen
 	- Plattformen brechen ein
 	- Spieler kann von Seil abrutschen / muss Bewegung durchführen um auf Seil voran zu kommen
+
 - Ende des Spiels überlegen
 
-(- Architektur verbessern)
+- Architektur verbessern:
+	- Scale Faktor einführen, der einfaches anpassen an die Ausführungsumgebung zulässt:
+		- Desktop
+		- localhost Server
+		- CAVE
+	- evtl. Config File für gloable Konstanten
+		- Schwerkraft
+		- Geschwindigkeit
+		- Geschwindigkeits Verlust
+		- Scale Factor für Plattform
+		- Pfade zu 3D Objekten
+		- 
