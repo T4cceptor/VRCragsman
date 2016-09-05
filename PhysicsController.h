@@ -1,5 +1,6 @@
 #pragma once
 #include "PhysicsModel.h"
+#include "OSGIntersectAction.h"
 #include <thread>
 
 OSG_USING_NAMESPACE // activate the OpenSG namespace
@@ -14,6 +15,11 @@ public:
 	void calculateNewTick();
 	void calculateNewTickForPhysicsObject(VRGPhysicsObject& obj);
 
+	bool collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
+	bool distance(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
+
+	Vec3f getReflectionVector();
+
 private:
 	PhysicsModel model;
 	int tick;
@@ -27,6 +33,10 @@ private:
 	float gravity;
 	float minDirectionLengthValue;
 	Vec3f upVector;
+
+	Vec3f reflectionVector;
+
+	Vec3f PhysicsController::calcReflectionVector(Vec3f direction, Vec3f normal);
 	//std::thread physicThread1;
 	// Thread* threadOne = dynamic_cast<Thread *>(ThreadManager::the()->getThread("One"));
 

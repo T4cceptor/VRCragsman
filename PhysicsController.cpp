@@ -41,6 +41,10 @@ void PhysicsController::registerNewPhysicsObject(VRGPhysicsObject obj, bool isMo
 	}
 }
 
+Vec3f PhysicsController::getReflectionVector(){
+	return reflectionVector;
+}
+
 // registerNewPhysicsObject
 //void PhysicsController::registerNewMoveableObject(VRGPhysicsObject obj){
 //	VRGLogger::logMessage("Registered new moveable physic object ");
@@ -74,6 +78,47 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 		rotation = q1 * q2;
 }
 
+bool PhysicsController::collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2){
+	// TODO
+	Line ray = Line(obj1.getPosition() + obj1.getDirection(), obj1.getDirection());
+	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
+	iAct->setLine(ray, general::hitDistance);
+	NodeRefPtr someNode = obj2.getRootNode();
+	iAct->apply((Node * const)someNode);
+    if (iAct->didHit())
+    {
+		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
+		double dotProd = iAct->getHitNormal() * Vec3f(0,1,0);
+		obj1.setDirection(obj1.getDirection() * (dotProd > 0.1 ? dotProd : 0.1));
+		// std::cout << "new dotProd: " << dotProd << std::endl;
+		return true;
+    }
+	return false;
+}
+
+Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
+	direction.normalize();
+	double dotProd = direction * normal;
+	return Vec3f(
+		direction[0] - 2 * normal[0] * dotProd, 
+		direction[1] - 2 * normal[1] * dotProd, 
+		direction[2] - 2 * normal[2] * dotProd
+		);
+}
+
+/*
+TVector ReflectVector (TVector a, TVector norm) 
+{
+	TVector res;
+//	NormalizeVector (&a);
+//	NormalizeVector (&norm);
+	double dotprod = DotProduct (a, norm);
+	res.x = a.x - 2 * norm.x * dotprod;
+	res.y = a.y - 2 * norm.y * dotprod;
+	res.z = a.z - 2 * norm.z * dotprod;
+	return res;
+}
+*/
 
 void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
 		Vec3f itemDirection = obj.getDirection();

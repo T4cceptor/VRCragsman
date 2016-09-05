@@ -10,6 +10,7 @@ public:
 	~VRGPhysicsObject(void);
 
 	void setDirection(float x, float y, float z);
+	void setDirection(Vec3f newDirection);
 	void setSpeed(float newSpeed);
 	Vec3f getDirection();
 	float getSpeed();
