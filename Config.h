@@ -12,7 +12,7 @@ namespace general {
 	const Vec3f rightVector = Vec3f(1,0,0); // je nach Koordinatensystem einstellen
 	const Vec3f forwardVector = Vec3f(0,0,-1); // je nach Koordinatensystem einstellen
 
-
+	const float minDistanceToFloor = 50.0f;
 }
 
 namespace cave{
