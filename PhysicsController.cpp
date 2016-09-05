@@ -75,6 +75,20 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 }
 
 
+void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
+		Vec3f itemDirection = obj.getDirection();
+		Vec3f itemPosition = obj.getPosition();
+		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
+			obj.addTranslation(itemDirection * speed); 
+			Vec3f newDirection = itemDirection - itemDirection * speedloss;
+			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
+			if(newDirection.length() < minDirectionLengthValue){
+				newDirection = Vec3f(0,0,0);
+			}
+			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
+			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, obj.getTransformation()->editRotation());
+		}
+}
 
 void PhysicsController::calculateNewTick(){
 	clock_t now = clock();
@@ -94,6 +108,9 @@ void PhysicsController::calculateNewTick(){
 		// => nur einen Hook erzeugen und diesen bewegen! => Performance + Memory Verbesserung
 	for (std::list<VRGPhysicsObject>::iterator it = movObj.begin(); it != movObj.end(); ++it){
 		VRGPhysicsObject poPtr = (* it);
+		calculateNewTickForPhysicsObject(poPtr);
+
+		/*
 		Vec3f itemDirection = poPtr.getDirection();
 		Vec3f itemPosition = poPtr.getPosition();
 
@@ -122,6 +139,7 @@ void PhysicsController::calculateNewTick(){
 			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, (* it).getTransformation()->editRotation());
 			
 		}
+		*/
 
 		/************************** Old Code ******************************/
 			/*Matrix m = Matrix();

@@ -12,6 +12,7 @@ public:
 	void registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable);
 	// void registerNewMoveableObject(VRGPhysicsObject obj, bool isMoveable);
 	void calculateNewTick();
+	void calculateNewTickForPhysicsObject(VRGPhysicsObject& obj);
 
 private:
 	PhysicsModel model;
