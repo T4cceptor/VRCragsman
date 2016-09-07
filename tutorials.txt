@@ -1,0 +1,95 @@
+Most important:
+OpenSG 2.0 Tutorial: http://www.opensg.org/wiki/Tutorial
+OpenSG 2.0 Doc: http://opensg.fraunhofer.sg/user/gerrit/OpenSG.Doc/
+
+Dokumentation!
+http://opensg.fraunhofer.sg/user/gerrit/OpenSG.Doc/
+http://www.opensg.org/htdocs/doc-1.8/Traversal.html
+-> IntersectionAction um collision detection umzusetzen
+
+
+OpenSG Tutorials:
+http://www.opensg.org/wiki/Tutorial
+http://www.opensg.org/wiki/Tutorial/OpenSG1/Modelling
+
+Moving in the scene:
+http://www.opensg.org/htdocs/doc-1.8/PageSystemWindow.html
+http://www.opensg.org/wiki/Tutorial/OpenSG1/Windows
+
+Blender Tutorials:
+https://www.blenderguru.com/tutorials/how-to-make-a-cave/
+https://www.youtube.com/watch?v=DEDsZuUjI0I
+
+https://www.pinterest.com/pin/457819118341579248/
+
+http://www.reynantemartinez.com/how-to-model-a-rope-in-blender.html
+
+https://www.youtube.com/watch?v=6mOznK7Ocyk
+
+http://agus3d.blogspot.de/2012/05/blender-cycles-ray-length-node-output.html
+
+
+https://www.youtube.com/watch?v=31oXBNfJSq8
+
+
+
+// Session 17.06.2016
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1Navigator.html#a372a6f403cbf9318c3bb9668715af6e0
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1Navigator.html#a261a82d2134b05f3bbff95ac856d2a66
+http://www.opensg.org/htdocs/doc-1.8/OSGNavigator_8cpp_source.html#l00679
+http://www.opensg.org/htdocs/doc-1.8/PageSystemWindow.html
+http://www.opensg.org/htdocs/doc-1.8/PageSystemWindow.html#PageSystemWindowNavigatorsFly
+http://www.opensg.org/htdocs/doc-1.8/TutorialBasics.html#TutorialBasicExercises
+http://www.opensg.org/htdocs/doc-1.8/Traversal.html#TutorialTraversalTutorial
+http://www.opensg.org/htdocs/doc-1.8/Multithreading.html
+http://www.opensg.org/htdocs/doc-1.8/Clustering.html
+http://www.opensg.org/htdocs/doc-1.8/Modeling.html
+http://www.opensg.org/htdocs/doc-1.8/index.html
+
+http://www.lighthouse3d.com/tutorials/glut-tutorial/mouse-putting-it-all-together/
+http://www.lighthouse3d.com/tutorials/glut-tutorial/keyboard-example-moving-around-the-world/
+http://www.lighthouse3d.com/tutorials/glut-tutorial/the-mouse/
+http://www.lighthouse3d.com/very-simple-libs/
+http://www.lighthouse3d.com/tutorials/glut-tutorial/game-mode/
+https://www.opengl.org/discussion_boards/showthread.php/173554-how-to-pin-mouse-in-center-of-screen
+https://www.opengl.org/discussion_boards/showthread.php/164171-Hiding-Mouse-Cursor
+https://www.opengl.org/documentation/specs/glut/spec3/node28.html
+
+
+2016 - 07 - 02
+
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1PerspectiveCameraPtr.html
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1Geometry.html#a37f90bd8e8e50500a94bd73533c1e94d
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1Field.html
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1IntersectAction.html
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1IntersectAction.html#af41f7508f3e4a7b0695a278f196a5afe
+http://www.opensg.org/htdocs/doc-1.8/TutorialBasics.html
+http://www.opensg.org/htdocs/doc-1.8/classosg_1_1Point.html
+
+
+_________________________________________________
+Voraussetzungen:
+Visual Studio 2012 Express/Professional/Ultimate (https://www.microsoft.com/de-de/download/details.aspx?id=34673)
+CMake 3.2 oder neuer (http://www.cmake.org/files/v3.2/cmake-3.2.2-win32-x86.exe)
+CMake bei der Installation für alle Benutzer den Pfad setzen lassen.
+
+Das Archiv "libraries.zip" bitte ins Stammverzeichnis von C: entpacken.
+C:\
+ +- libraries
+     +- install
+         +- vs11_32
+             +- boost
+             +- freeglut
+             ...
+             +- vrpn
+
+
+Das Archiv "tutorials.zip" in ein beliebiges persönliches Verzeichnis entpacken.
+Dort die Datei "vs11_32_osg_invrs.cmake" auf "run_cmake.bat" ziehen (Drag'n'drop). (Cmake erstellt nun unter "build_vs11_32_osg_invrs" die Projekt-Dateien für Visual Studio. Danach wird ein Shortcut "start_vs_vs11_32_osg_invrs" erstellt.)
+Mit dem erstellten Shortcut (Verknüpfung auf "build_vs11_32_osg_invrs/tutorials.sln") starten sie die Entwicklungsumgebung mit den einzelnen Projekten (Release-Version).
+(Alternativ ist vs11_32_osg-only.cmake vorhanden. Hiermit kann entsprechend verfahren werden. Hier sind Debug- und Release-Versionen vorhanden, allerdings nur für reine OpenSG-Projekte ohne InVRs.)
+
+Den csm-Renderserver können sie bei Bedarf mit "start_csm" (Verknüpfung auf "C:\libraries\install\vs11_32\invrs\bin\start_csm.bat") starten.
+Die lokale Windows-Firewall brauchen sie nicht zu öffnen. Falls ein Dialog-Fenster auftaucht, einfach "Abbrechen" betätigen.
+
+Viel Spaß und Erfolg

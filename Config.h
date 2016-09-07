@@ -13,7 +13,7 @@ namespace general {
 	const Vec3f forwardVector = Vec3f(0,0,-1); // je nach Koordinatensystem einstellen
 
 	const float minDistanceToFloor = 50.0f;
-	const float hitDistance = 50.0f;
+	const float hitDistance = 20.0f;
 }
 
 namespace cave{
@@ -21,20 +21,22 @@ namespace cave{
 	// alte Werte: Vec3f(5100,300,5100);
 	const Vec3f scaleVector = Vec3f(10,10,10); // Skalierung des 3D Models
 
+	const float velocityReduction = 0.2; // gibt Prozentwert an um den die Geschwindigkeit eines auftreffenden Objekts veringert wird
+
 }
 
 namespace hook{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anfänglicher Translations Vektor
 	const Vec3f scaleVector = Vec3f(1,1,1); // Skalierung des 3D Models
 	const float movementOffsetScale = 5; // Offset Skalierung wenn Hook geworfen wird
-	const float movementVectorScale = -5; // 
+	const float movementVectorScale = -13; // 
 }
 
 namespace physics{
 	
 	// Problem: Werte müssen / sollten mit allgemeinem Skalierungsfaktor verrechnet werden
 	
-	const float speed = 0.3; // TODO: Geschwindigkeit richtig einstellen
+	const float speed = 0.2; // TODO: Geschwindigkeit richtig einstellen
 	const int heightDimension = 1; // 0 = x-axis, 1 = y-axis, 2 = z-axis
 	const double floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
 	const float speedloss = 0.0001; // TODO: Geschwindigkeit verlust richtig einstellen

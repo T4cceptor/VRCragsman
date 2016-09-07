@@ -81,15 +81,18 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 bool PhysicsController::collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2){
 	// TODO
 	Line ray = Line(obj1.getPosition() + obj1.getDirection(), obj1.getDirection());
+	// std::cout << "from: " << obj1.getPosition() << " to: " << obj1.getPosition() + obj1.getDirection() << std::endl;
+	std::cout << "vector: " << ray << std::endl;
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	iAct->setLine(ray, general::hitDistance);
+
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
-		double dotProd = iAct->getHitNormal() * Vec3f(0,1,0);
-		obj1.setDirection(obj1.getDirection() * (dotProd > 0.1 ? dotProd : 0.1));
+		double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
+		// obj1.setDirection(obj1.getDirection() * (dotProd > 0.1 ? dotProd : 0.1));
 		// std::cout << "new dotProd: " << dotProd << std::endl;
 		return true;
     }
@@ -97,13 +100,27 @@ bool PhysicsController::collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2
 }
 
 Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
-	direction.normalize();
-	double dotProd = direction * normal;
-	return Vec3f(
-		direction[0] - 2 * normal[0] * dotProd, 
-		direction[1] - 2 * normal[1] * dotProd, 
-		direction[2] - 2 * normal[2] * dotProd
-		);
+	// TODO: nicht korrekt??
+	// R= 2*(-I dot N)*N + I 
+	Vec3f tempDirection = Vec3f(direction);
+	float speed = direction.length();
+	tempDirection.normalize();
+	normal.normalize();
+	// double dotProd = tempDirection * normal;
+
+	/*
+	R ist der neue Richtungsvektor
+I ist der alte Richtungsvektor vor der Kollision
+N ist der Normalenvektor des Kollisionspunktes 
+
+Der neue Vektor R wird wie folgt berechnet: 
+
+R= 2*(-I dot N)*N + I 
+	*/
+
+	Vec3f r = 2 * (-direction.dot(normal)) * normal + direction;
+	r.normalize();
+	return r * speed * cave::velocityReduction;
 }
 
 /*
@@ -127,11 +144,12 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
 			obj.addTranslation(itemDirection * speed); 
 			Vec3f newDirection = itemDirection - itemDirection * speedloss;
 			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
+			obj.setLookAt(newDirection);
 			if(newDirection.length() < minDirectionLengthValue){
 				newDirection = Vec3f(0,0,0);
 			}
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
-			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, obj.getTransformation()->editRotation());
+			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());
 		}
 }
 

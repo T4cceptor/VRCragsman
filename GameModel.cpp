@@ -109,9 +109,11 @@ void GameModel::moveHook(Pnt3f pos, Vec3f direction){
 	// TODO: Haken anhand des MWand Vektors ausrichten
 	// TODO für Cave -> MagicWand Vector
 	
-	MatrixLookAt(pos, pos + direction, Vec3f(0,1,0), hook.getRotation());
+	
 	hook.setPosition(pos[0],pos[1],pos[2]);
 	hook.setDirection(direction.getValues()[0], direction.getValues()[1], direction.getValues()[2]);
+	hook.setLookAt(direction);
+	// MatrixLookAt(pos, pos + direction, Vec3f(0,1,0), hook.getRotation());
 	std::cout << "position: " << pos << std::endl;
 	std::cout << "direction: " << direction << std::endl;
 	std::cout << "rotation: " << hook.getRotation() << std::endl;

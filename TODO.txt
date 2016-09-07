@@ -16,6 +16,7 @@ Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 			2) Spieler bewegt sich automatisch auf nächste Plattform
 				-> Idee: Spieler muss Knopf gedrückt halten damit er voran kommt
 		- Cave: Hook wird abgelenkt, kein weiterer Effekt
+	- Problem: LookAt Funktion ist nicht richtig implementiert, es müsste einen eigenen LookAt Vektor geben
 
 - Animationen
 	- Pull-In 
