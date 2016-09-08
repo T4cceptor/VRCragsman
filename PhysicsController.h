@@ -18,6 +18,8 @@ public:
 	bool collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
 	bool distance(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
 
+	bool didHitPLattform(VRGPhysicsObject& obj);
+
 	Vec3f getReflectionVector();
 
 private:

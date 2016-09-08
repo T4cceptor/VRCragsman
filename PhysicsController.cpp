@@ -21,6 +21,8 @@ PhysicsController::PhysicsController(void)
 	minDirectionLengthValue = physics::minDirectionLengthValue * general::scale;
 	upVector = general::upVector;
 
+	// TODO: funktioniert in der Cave nicht!
+	// TODO: in opensg_vrpn.cpp auslagern
 	tick = 0;
 	time = 0;
 	startTime = clock();
@@ -58,84 +60,46 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 		Vec3f newup = view % right;
 		Vec3f objForward = Vec3f(0,0,1);
 		Vec3f objUp = Vec3f(0,1,0);
-
 		float dot2 =  right * objForward;
 		Vec3f newView = Vec3f(view[0],0,view[2]);
 		newView.normalize();
 		float realDotXYPlane = newView * objForward;
 		float realAngle = acos(realDotXYPlane);
 		Quaternion q1 = Quaternion(objUp, dot2 > 0 ? -realAngle : realAngle);
-
-		// rotation = q1;
 		float dot3 = newup * objUp;
 		float angle2 = 0.0f;
 		if(abs(abs(dot3) - 1.0f) > 0.0001f){
 			angle2 = acos(dot3);
 		}
-
 		float dot4 = view * objUp;
 		Quaternion q2 = Quaternion(Vec3f(-1,0,0), dot4 < 0 ? -angle2 : angle2);
 		rotation = q1 * q2;
 }
 
 bool PhysicsController::collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2){
-	// TODO
 	Line ray = Line(obj1.getPosition() + obj1.getDirection(), obj1.getDirection());
-	// std::cout << "from: " << obj1.getPosition() << " to: " << obj1.getPosition() + obj1.getDirection() << std::endl;
-	std::cout << "vector: " << ray << std::endl;
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	iAct->setLine(ray, general::hitDistance);
-
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
 		double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
-		// obj1.setDirection(obj1.getDirection() * (dotProd > 0.1 ? dotProd : 0.1));
-		// std::cout << "new dotProd: " << dotProd << std::endl;
 		return true;
     }
 	return false;
 }
 
 Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
-	// TODO: nicht korrekt??
-	// R= 2*(-I dot N)*N + I 
 	Vec3f tempDirection = Vec3f(direction);
 	float speed = direction.length();
 	tempDirection.normalize();
 	normal.normalize();
-	// double dotProd = tempDirection * normal;
-
-	/*
-	R ist der neue Richtungsvektor
-I ist der alte Richtungsvektor vor der Kollision
-N ist der Normalenvektor des Kollisionspunktes 
-
-Der neue Vektor R wird wie folgt berechnet: 
-
-R= 2*(-I dot N)*N + I 
-	*/
-
 	Vec3f r = 2 * (-direction.dot(normal)) * normal + direction;
 	r.normalize();
 	return r * speed * cave::velocityReduction;
 }
-
-/*
-TVector ReflectVector (TVector a, TVector norm) 
-{
-	TVector res;
-//	NormalizeVector (&a);
-//	NormalizeVector (&norm);
-	double dotprod = DotProduct (a, norm);
-	res.x = a.x - 2 * norm.x * dotprod;
-	res.y = a.y - 2 * norm.y * dotprod;
-	res.z = a.z - 2 * norm.z * dotprod;
-	return res;
-}
-*/
 
 void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
 		Vec3f itemDirection = obj.getDirection();
@@ -151,6 +115,17 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
 			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());
 		}
+}
+
+bool PhysicsController::didHitPLattform(VRGPhysicsObject& obj){
+	for(int i = 0; i < pltPositions::size; i++){
+		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
+		float distance =  (obj.getPosition() - scaledPosition).length();
+		if(distance < general::plattformHitDistance){
+			return true;
+		}
+	}
+	return false;
 }
 
 void PhysicsController::calculateNewTick(){

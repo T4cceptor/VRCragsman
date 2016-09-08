@@ -12,8 +12,10 @@ namespace general {
 	const Vec3f rightVector = Vec3f(1,0,0); // je nach Koordinatensystem einstellen
 	const Vec3f forwardVector = Vec3f(0,0,-1); // je nach Koordinatensystem einstellen
 
+	const float plattformHitDistance = 250.0f;
 	const float minDistanceToFloor = 50.0f;
 	const float hitDistance = 20.0f;
+
 }
 
 namespace cave{
@@ -45,21 +47,25 @@ namespace physics{
 
 }
 
+// TODO:
+// Idee: dynamische hit Distanz, je nach Plattform, als 4D Vektor
 namespace pltPositions{
-	const int size = 10;
-	const Vec3f positions[10] = { 
-		Vec3f(0,0,0), 
-		Vec3f(-1142,0,-571), 
-		Vec3f(100,0,100), 
-		Vec3f(1000,0,1000), 
-		Vec3f(-10,0,-10),  
-		Vec3f(-100,0,-100), 
-		Vec3f(-1000,0,-1000), 
-		Vec3f(50,50,50), 
-		Vec3f(10,10,10),
-		Vec3f(2000,200,100)
+	const int size = 12;
+	const Vec3f positions[12] = { 
+		Vec3f(0,0,0),  // 0, -134, 0
+		Vec3f(-1217,-411,-446), 
+		Vec3f(-646, -579, -2355),
+		Vec3f(-2885, -460, -2480),
+		Vec3f(-4464, -535, -3730),  
+		Vec3f(-4139, -823, -5308), 
+		Vec3f(-6509, -834, -4719), 
+		Vec3f(-7277, -1324, -7274), 
+		Vec3f(-6935, -2056, -9852),
+		Vec3f(-9397, -627, -9005),
+		Vec3f(-9236, -1633, -11737),
+		Vec3f(-12619, -2718, -11006)
 	};
-	const float rotation[10] = {
+	const float rotation[12] = {
 		1.0f,
 		0.5f,
 		1.4f,

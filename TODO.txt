@@ -2,6 +2,8 @@ TODO Overview
 
 Vorraussichtlich: noch 2-3 Termine in der Cave / Lab nötig
 
+- Allgemein / GameLoop
+		- richtiges Tick-System implementieren !!!
 - Wurf-Interaktion
 	- Idee: erster Knopfdruck hebt Hook auf
 	- nächster Knopfdruck lässt den Hook wieder los
