@@ -60,7 +60,7 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 		Vec3f right = up % view;
 		right.normalize();
 		Vec3f newup = view % right;
-		Vec3f objForward = general::forwardVector;
+		Vec3f objForward = Vec3f(0,0,1);
 		Vec3f objUp = general::upVector;
 		float dot2 =  right * objForward;
 		Vec3f newView = Vec3f(view[0],0,view[2]);
