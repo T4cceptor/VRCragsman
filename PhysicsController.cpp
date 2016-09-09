@@ -53,13 +53,15 @@ Vec3f PhysicsController::getReflectionVector(){
 //}
 void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation){
 		// TODO Performance upgrade!!!
+//		std::cout << "calculating new look at: " << at << std::endl;
+//		std::cout << "rotation: " << rotation << std::endl;
 		Vec3f view = at - from;
 		view.normalize();
 		Vec3f right = up % view;
 		right.normalize();
 		Vec3f newup = view % right;
-		Vec3f objForward = Vec3f(0,0,1);
-		Vec3f objUp = Vec3f(0,1,0);
+		Vec3f objForward = general::forwardVector;
+		Vec3f objUp = general::upVector;
 		float dot2 =  right * objForward;
 		Vec3f newView = Vec3f(view[0],0,view[2]);
 		newView.normalize();
@@ -76,16 +78,19 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 		rotation = q1 * q2;
 }
 
-bool PhysicsController::collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2){
-	Line ray = Line(obj1.getPosition() + obj1.getDirection(), obj1.getDirection());
+bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
+	Vec3f direction = obj1.getDirection();
+	direction.normalize();
+	Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	iAct->setLine(ray, general::hitDistance);
+	iAct->setLine(ray, general::hitDistance * general::scale);
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
+      std::cout << "hook hit cave" << std::endl;
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
-		double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
+		// double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
 		return true;
     }
 	return false;
@@ -101,7 +106,7 @@ Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
 	return r * speed * cave::velocityReduction;
 }
 
-void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
+void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 		Vec3f itemDirection = obj.getDirection();
 		Vec3f itemPosition = obj.getPosition();
 		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
@@ -117,7 +122,7 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject& obj){
 		}
 }
 
-bool PhysicsController::didHitPLattform(VRGPhysicsObject& obj){
+bool PhysicsController::didHitPLattform(VRGPhysicsObject obj){
 	for(int i = 0; i < pltPositions::size; i++){
 		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
 		float distance =  (obj.getPosition() - scaledPosition).length();
@@ -205,8 +210,8 @@ void PhysicsController::calculateNewTick(){
 		// if(needCollisionCheck && !didHitAnything((* it))){
 		//if(float((* it).getPosition().getValues()[2]) > -10.0f){ // TODO: -10 wird nicht der richtige Wert sein!
 		//	(* it).setDirection(itemDirection.getValues()[0], itemDirection.getValues()[1], itemDirection.getValues()[2] - 1);
-		//	// TODO: direction ändern, Schwerkraft
-		//	// hier wird z value der Direction geändert
+		//	// TODO: direction ï¿½ndern, Schwerkraft
+		//	// hier wird z value der Direction geï¿½ndert
 		//}
 
 		/*

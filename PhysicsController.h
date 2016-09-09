@@ -13,12 +13,12 @@ public:
 	void registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable);
 	// void registerNewMoveableObject(VRGPhysicsObject obj, bool isMoveable);
 	void calculateNewTick();
-	void calculateNewTickForPhysicsObject(VRGPhysicsObject& obj);
+	void calculateNewTickForPhysicsObject(VRGPhysicsObject obj);
 
-	bool collision(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
+	bool collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2);
 	bool distance(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
 
-	bool didHitPLattform(VRGPhysicsObject& obj);
+	bool didHitPLattform(VRGPhysicsObject obj);
 
 	Vec3f getReflectionVector();
 
@@ -38,7 +38,7 @@ private:
 
 	Vec3f reflectionVector;
 
-	Vec3f PhysicsController::calcReflectionVector(Vec3f direction, Vec3f normal);
+	Vec3f calcReflectionVector(Vec3f direction, Vec3f normal);
 	//std::thread physicThread1;
 	// Thread* threadOne = dynamic_cast<Thread *>(ThreadManager::the()->getThread("One"));
 

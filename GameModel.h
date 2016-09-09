@@ -36,8 +36,8 @@ public:
 	//Init
 	void initGameModel(NodeFactory nodeFa);
 	void createScenegraph();
-	void GameModel::rotateCave(float x, float y, float z, float rad);  
-	void GameModel::createNewLight(Pnt3f pos);
+	void rotateCave(float x, float y, float z, float rad);  
+	void createNewLight(Pnt3f pos);
 
 	// Physics
 	PhysicsController physicCtrl;
