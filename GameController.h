@@ -23,6 +23,8 @@ public:
 	int getGameState();
 	void setGameState(int newGS);
 
+	void moveHook(Vec3f direction, float speed);
+
 private:
 	GameModel * model;
 	PhysicsController * pCtrl;

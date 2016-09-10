@@ -3,79 +3,22 @@
 
 extern float timeDelta;
 
-GameController::GameController(void)
-{
-	std::cout << "GameController contructor called" << std::endl;
-}
-
-
-GameController::~GameController(void)
-{
-}
-
-void GameController::init(OSGCSM::CAVESceneManager* newMgr){
-	mgr = newMgr;
-	pCtrl = new PhysicsController();
-	model = new GameModel();
-	model->initGameModel(pCtrl);
-
-	currentTick = 0;
-	readyToChangeState = 0;
-	gameState = 0;
-	startTime = clock();
-	prepToStop = false;
-	currentPltForm = 0;
-}
-
-int GameController::getGameState(){
-	return gameState;
-}
-
-void GameController::setGameState(int newGS){
-	gameState = newGS;
-}
-
-GameModel * GameController::getModel(){
-	return model;
-}
-
-NodeTransitPtr GameController::setupScenegraph(){
-	model->createScenegraph();
-	std::cout << "setting up scenegraph" << std::endl;
-	return model->getScenegraphRoot().getRootNode();
-}
-
-int GameController::calcNewTick(){
-	clock_t now = clock();
-	clock_t delta = now - startTime;
-	timeDelta = static_cast<float>(delta);
-	int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
-	int newTick = long(static_cast<long>(delta) / ( CLOCKS_PER_SEC / general::ticksPerSecond)) % general::ticksPerSecond;
-	return newTick;
-}
-
-bool GameController::isGrounded(){
-	Line ray = Line(mgr->getTranslation() - Vec3f(0, 1 * general::scale, 0), Vec3f(0,-1,0));
-	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	iAct->setLine(ray);
-	NodeRefPtr someNode = model->getCave().getRootNode();
-	iAct->apply((Node * const)someNode);
-	if (iAct->didHit())
-	{
-		float dis = (iAct->getHitPoint().subZero() - mgr->getTranslation()).length();
-		if(dis > general::minDistanceToFloor * general::scale ){
-			return false;
-		}
-		return true;
-	}
-	return false;
-}
-
 void GameController::changeCurrentState(int newState){
 	if(readyToChangeState == 0){
 		readyToChangeState = newState;
 		std::cout << "next state available: " << readyToChangeState << std::endl;
 	}
+}
+
+void GameController::moveHook(Vec3f direction, float speed){
+	// TODO: checken ob der Haken bereits fliegt!
+	prepToStop = false;
+	model->moveHook(
+		mgr->getTranslation() + direction * hook::movementOffsetScale * general::scale, 
+		direction * hook::movementVectorScale * general::scale * speed
+	);
+
+	std::cout << "moving hook with speed: " << speed << std::endl;
 }
 
 void GameController::callGameLoop(){
@@ -137,5 +80,71 @@ void GameController::callGameLoop(){
 				}
 			}
 		}
+}
 
+int GameController::calcNewTick(){
+	clock_t now = clock();
+	clock_t delta = now - startTime;
+	timeDelta = static_cast<float>(delta);
+	int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
+	int newTick = long(static_cast<long>(delta) / ( CLOCKS_PER_SEC / general::ticksPerSecond)) % general::ticksPerSecond;
+	return newTick;
+}
+
+bool GameController::isGrounded(){
+	Line ray = Line(mgr->getTranslation() - Vec3f(0, 1 * general::scale, 0), Vec3f(0,-1,0));
+	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
+	iAct->setLine(ray);
+	NodeRefPtr someNode = model->getCave().getRootNode();
+	iAct->apply((Node * const)someNode);
+	if (iAct->didHit())
+	{
+		float dis = (iAct->getHitPoint().subZero() - mgr->getTranslation()).length();
+		if(dis > general::minDistanceToFloor * general::scale ){
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+
+int GameController::getGameState(){
+	return gameState;
+}
+
+void GameController::setGameState(int newGS){
+	gameState = newGS;
+}
+
+GameModel * GameController::getModel(){
+	return model;
+}
+
+NodeTransitPtr GameController::setupScenegraph(){
+	model->createScenegraph();
+	std::cout << "setting up scenegraph" << std::endl;
+	return model->getScenegraphRoot().getRootNode();
+}
+
+GameController::GameController(void)
+{
+	std::cout << "GameController contructor called" << std::endl;
+}
+
+GameController::~GameController(void)
+{
+}
+
+void GameController::init(OSGCSM::CAVESceneManager* newMgr){
+	mgr = newMgr;
+	pCtrl = new PhysicsController();
+	model = new GameModel();
+	model->initGameModel(pCtrl);
+
+	currentTick = 0;
+	readyToChangeState = 0;
+	gameState = 1;
+	startTime = clock();
+	prepToStop = false;
+	currentPltForm = 0;
 }
