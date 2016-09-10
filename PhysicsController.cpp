@@ -3,15 +3,12 @@
 #include "Config.h"
 
 extern int currentId;
-
-void testFunction(){
-
-}
+extern float timeDelta;
 
 PhysicsController::PhysicsController(void)
 {
 	model = * new PhysicsModel();
-
+	std::cout << "PhysicsController contructor called" << std::endl;
 	// Werte in Config.h einstellen
 	heightDimension = physics::heightDimension;
 	floorValue = physics::floorValue * general::scale;
@@ -21,8 +18,6 @@ PhysicsController::PhysicsController(void)
 	minDirectionLengthValue = physics::minDirectionLengthValue * general::scale;
 	upVector = general::upVector;
 
-	// TODO: funktioniert in der Cave nicht!
-	// TODO: in opensg_vrpn.cpp auslagern
 	tick = 0;
 	time = 0;
 	startTime = clock();
@@ -88,7 +83,7 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
-      std::cout << "hook hit cave" << std::endl;
+		// std::cout << "hook hit cave" << std::endl;
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
 		// double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
 		return true;
@@ -107,6 +102,7 @@ Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
 }
 
 void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
+	// TODO: zeitliche Komponente mit einbeziehen
 		Vec3f itemDirection = obj.getDirection();
 		Vec3f itemPosition = obj.getPosition();
 		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
@@ -122,15 +118,15 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 		}
 }
 
-bool PhysicsController::didHitPLattform(VRGPhysicsObject obj){
+int PhysicsController::didHitPLattform(VRGPhysicsObject obj){
 	for(int i = 0; i < pltPositions::size; i++){
 		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
 		float distance =  (obj.getPosition() - scaledPosition).length();
-		if(distance < general::plattformHitDistance){
-			return true;
+		if(distance < general::plattformHitDistance * general::scale){
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
 void PhysicsController::calculateNewTick(){

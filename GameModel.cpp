@@ -4,7 +4,7 @@
 
 GameModel::GameModel(void)
 {
-
+	std::cout << "GameModel contructor called" << std::endl;
 }
 
 /* TODO Parameter für Start übergeben - ?
@@ -71,9 +71,9 @@ PlattformObject GameModel::getPlattformWithId(){
 */
 
 /** Initialize Model and create Scenegraph functions **/
-void GameModel::initGameModel(NodeFactory nodeFa){
-	nf = nodeFa;
-	physicCtrl = * new PhysicsController();
+void GameModel::initGameModel(PhysicsController * pc){
+	nf = * new NodeFactory();
+	physicCtrl = *pc;
 	// std::thread physicThread1(&physicCtrl.calculateNewTick, physicCtrl);
 	// physicThread1.join();
 

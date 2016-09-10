@@ -16,6 +16,8 @@ namespace general {
 	const float minDistanceToFloor = 50.0f;
 	const float hitDistance = 20.0f;
 
+	const int ticksPerSecond = 50;
+
 }
 
 namespace cave{

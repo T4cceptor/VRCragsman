@@ -34,7 +34,7 @@ public:
 	void moveHook(Pnt3f pos, Vec3f direction);
 
 	//Init
-	void initGameModel(NodeFactory nodeFa);
+	void initGameModel(PhysicsController * pc);
 	void createScenegraph();
 	void rotateCave(float x, float y, float z, float rad);  
 	void createNewLight(Pnt3f pos);
