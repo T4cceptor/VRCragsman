@@ -75,16 +75,22 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 
 bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	Vec3f direction = obj1.getDirection();
+	float directionLength = direction.length() * speed;
 	direction.normalize();
 	Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	iAct->setLine(ray, general::hitDistance * general::scale);
+	std::cout << "directionLength: " << directionLength << std::endl;
+	// TODO, anpassen des direction Vectors um zu verhindern, dass Grapple außerhalb der Cave landet
+	iAct->setLine(ray, directionLength); 
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
 		// std::cout << "hook hit cave" << std::endl;
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
+		obj1.setDirection(reflectionVector);
+		Vec3f hitPoint = iAct->getHitPoint().subZero();
+		obj1.setPosition(hitPoint[0],hitPoint[1],hitPoint[2]);
 		// double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
 		return true;
     }

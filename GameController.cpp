@@ -35,8 +35,9 @@ void GameController::callGameLoop(){
 						bool didHit = pCtrl->collision(hook, model->getCave());
 						if(didHit && !prepToStop){
 							prepToStop = true;
-						} else if(prepToStop) {
+						} else if(!didHit && prepToStop) {
 							prepToStop = false;
+							std::cout << "cave hit" << std::endl;
 							int pltformHit = pCtrl->didHitPLattform(hook);
 							if(pltformHit != -1){
 								// std::cout << "plattform hit" << std::endl;
@@ -85,8 +86,8 @@ void GameController::callGameLoop(){
 int GameController::calcNewTick(){
 	clock_t now = clock();
 	clock_t delta = now - startTime;
-	timeDelta = static_cast<float>(delta);
-	int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
+	// timeDelta = static_cast<float>(delta);
+	// int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
 	int newTick = long(static_cast<long>(delta) / ( CLOCKS_PER_SEC / general::ticksPerSecond)) % general::ticksPerSecond;
 	return newTick;
 }
