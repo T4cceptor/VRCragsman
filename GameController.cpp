@@ -3,22 +3,34 @@
 
 extern float timeDelta;
 
+void GameController::resetGame(){
+	// TODO
+	std::cout << "Game reset" << std::endl;
+}
+
 void GameController::changeCurrentState(int newState){
-	if(readyToChangeState == 0){
-		readyToChangeState = newState;
-		std::cout << "next state available: " << readyToChangeState << std::endl;
-	}
+	//if(readyToChangeState == 0){
+	//	readyToChangeState = newState;
+	//	std::cout << "next state available: " << readyToChangeState << std::endl;
+	//}
+	gameState = newState;
+	std::cout << "next state: " << gameState << std::endl;
 }
 
 void GameController::moveHook(Vec3f direction, float speed){
 	// TODO: checken ob der Haken bereits fliegt!
 	prepToStop = false;
+	readyToChangeState = 0;
 	model->moveHook(
 		mgr->getTranslation() + direction * hook::movementOffsetScale * general::scale, 
 		direction * hook::movementVectorScale * general::scale * speed
 	);
-
 	std::cout << "moving hook with speed: " << speed << std::endl;
+}
+
+float GameController::calcDistanceToHook(){
+	Vec3f distanceVector = model->getHook().getPosition() - mgr->getTranslation();
+	return distanceVector.length();
 }
 
 void GameController::callGameLoop(){
@@ -30,23 +42,23 @@ void GameController::callGameLoop(){
 				Vec3f direction = hook.getDirection();
 				if(direction.length() > 0){
 					pCtrl->calculateNewTickForPhysicsObject(hook);
+					if(calcDistanceToHook() > hook::maxDistanceValue){
+						// TODO
+						std::cout << "" << "\n";
+						hook.setDirection(0,0,0);
+					}
 					// TODO: animateRope();
-					if(hook.getDirection().length() > 0){
+					else if(hook.getDirection().length() > 0){
 						bool didHit = pCtrl->collision(hook, model->getCave());
-						if(didHit && !prepToStop){
-							prepToStop = true;
-						} else if(!didHit && prepToStop) {
-							prepToStop = false;
-							std::cout << "cave hit" << std::endl;
+						// TODO: falls sich Position des Hakens über mehrere Ticks nicht ändert => direction = 0,0,0
+						if(didHit){
 							int pltformHit = pCtrl->didHitPLattform(hook);
 							if(pltformHit != -1){
-								// std::cout << "plattform hit" << std::endl;
+								std::cout << "plattform hit" << std::endl;
 								currentPltForm = pltformHit;
 								hook.setDirection(Vec3f(0,0,0));
 								changeCurrentState(2);
 							}
-							Vec3f reflectionVector = pCtrl->getReflectionVector();
-							hook.setDirection(reflectionVector);
 						}
 					}
 				}
@@ -58,29 +70,51 @@ void GameController::callGameLoop(){
 
 				Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 				Vec3f direction = pltformPosition - hook.getPosition();
-				// std::cout << "direction: " << direction << " , length: " << direction.length() << "\n";
-				if(direction.length() > physics::minDirectionLengthValue){
-					hook.setDirection(direction * 0.1);
+
+				//std::cout << "pltformPosition: " << pltformPosition << "\n";
+				//std::cout << "direction: " << direction << " , length: " << direction.length() << "\n";
+
+				if(direction.length() > physics::minDirectionLengthValue * general::scale){
+					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
+					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
 				} else {
 					hook.setPosition(pltformPosition[0], pltformPosition[1], pltformPosition[2]);
 					changeCurrentState(3);
 				}
+				// changeCurrentState(3);
 			} else if (gameState == 3){
 				// TODO
 				// movePlattform();
 				// if(finished()){
 				//	state = 1;
 				// }
-				Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
-				Vec3f direction = pltformPosition - mgr->getTranslation();
-				if(direction.length() > physics::minDirectionLengthValue){
-					mgr->setTranslation(direction * 0.1);
+				moveTowardsPlattform();
+			} else if (gameState == 4){
+				// TODO: Hook kommt zum Spieler zurück
+				// Problem: Plattform ist im Weg ...
+				// -> korrekte Bewegung nachahmen
+				Vec3f targetPosition = mgr->getTranslation();
+				Vec3f direction = targetPosition - hook.getPosition();
+				if(direction.length() > physics::minDirectionLengthValue * general::scale){
+					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
+					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
 				} else {
-					mgr->setTranslation(pltformPosition);
-					changeCurrentState(1);
+					hook.setPosition(targetPosition[0], targetPosition[1], targetPosition[2]);
+					changeCurrentState(3);
 				}
 			}
 		}
+}
+
+void GameController::moveTowardsPlattform(){
+	Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
+	Vec3f direction = pltformPosition - mgr->getTranslation();
+	if(direction.length() > physics::minDirectionLengthValue * general::scale){
+		mgr->setTranslation(mgr->getTranslation() + direction * 0.02);
+	} else {
+		mgr->setTranslation(pltformPosition);
+		changeCurrentState(1);
+	}
 }
 
 int GameController::calcNewTick(){

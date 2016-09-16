@@ -79,8 +79,7 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	direction.normalize();
 	Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	std::cout << "directionLength: " << directionLength << std::endl;
-	// TODO, anpassen des direction Vectors um zu verhindern, dass Grapple außerhalb der Cave landet
+	// std::cout << "directionLength: " << directionLength << std::endl;
 	iAct->setLine(ray, directionLength); 
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
@@ -91,7 +90,6 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 		obj1.setDirection(reflectionVector);
 		Vec3f hitPoint = iAct->getHitPoint().subZero();
 		obj1.setPosition(hitPoint[0],hitPoint[1],hitPoint[2]);
-		// double dotProd = 1 - abs(iAct->getHitNormal() * Vec3f(0,1,0));
 		return true;
     }
 	return false;

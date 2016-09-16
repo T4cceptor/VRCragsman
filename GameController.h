@@ -24,6 +24,7 @@ public:
 	void setGameState(int newGS);
 
 	void moveHook(Vec3f direction, float speed);
+	void resetGame();
 
 private:
 	GameModel * model;
@@ -40,5 +41,10 @@ private:
 
 	int calcNewTick();
 	void changeCurrentState(int newState);
+
+	void moveTowardsPlattform();
+
+	float calcDistanceToHook();
+
 };
 

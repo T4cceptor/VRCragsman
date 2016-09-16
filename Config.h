@@ -34,6 +34,7 @@ namespace hook{
 	const Vec3f scaleVector = Vec3f(0.02,0.02,0.02); // Skalierung des 3D Models
 	const float movementOffsetScale = 5; // Offset Skalierung wenn Hook geworfen wird
 	const float movementVectorScale = -25; // 
+	const float maxDistanceValue = 3500;
 }
 
 namespace physics{
@@ -44,8 +45,7 @@ namespace physics{
 	const double floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
 	const float speedloss = 0.001; // TODO: Geschwindigkeit verlust richtig einstellen
 	const float gravity = 0.9; // TODO: Schwerkraft simulieren
-	const float minDirectionLengthValue = 0.05; // TODO, ist nicht der richtige Wert !
-
+	const float minDirectionLengthValue = 2; // TODO, ist nicht der richtige Wert !
 }
 
 // TODO:
@@ -53,7 +53,7 @@ namespace physics{
 namespace pltPositions{
 	const int size = 12;
 	const Vec3f positions[12] = { 
-		Vec3f(0,0,0),  // 0, -134, 0
+		Vec3f(0,-67,0),  // 0, -134, 0
 		Vec3f(-1217,-411,-446), 
 		Vec3f(-646, -579, -2355),
 		Vec3f(-2885, -460, -2480),
