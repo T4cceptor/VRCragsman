@@ -31,10 +31,10 @@ namespace cave{
 
 namespace hook{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
-	const Vec3f scaleVector = Vec3f(0.02,0.02,0.02); // Skalierung des 3D Models
+	const Vec3f scaleVector = Vec3f(0.08,0.08,0.08); // Skalierung des 3D Models
 	const float movementOffsetScale = 5; // Offset Skalierung wenn Hook geworfen wird
 	const float movementVectorScale = -25; // 
-	const float maxDistanceValue = 3500;
+	const float maxDistanceValue = 1200;
 }
 
 namespace physics{
@@ -44,7 +44,7 @@ namespace physics{
 	const int heightDimension = 1; // 0 = x-axis, 1 = y-axis, 2 = z-axis
 	const double floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
 	const float speedloss = 0.001; // TODO: Geschwindigkeit verlust richtig einstellen
-	const float gravity = 0.9; // TODO: Schwerkraft simulieren
+	const float gravity = 2; // TODO: Schwerkraft simulieren
 	const float minDirectionLengthValue = 2; // TODO, ist nicht der richtige Wert !
 }
 

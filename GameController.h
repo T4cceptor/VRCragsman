@@ -43,8 +43,5 @@ private:
 	void changeCurrentState(int newState);
 
 	void moveTowardsPlattform();
-
-	float calcDistanceToHook();
-
 };
 

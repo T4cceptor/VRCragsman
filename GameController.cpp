@@ -28,27 +28,26 @@ void GameController::moveHook(Vec3f direction, float speed){
 	std::cout << "moving hook with speed: " << speed << std::endl;
 }
 
-float GameController::calcDistanceToHook(){
-	Vec3f distanceVector = model->getHook().getPosition() - mgr->getTranslation();
-	return distanceVector.length();
-}
-
 void GameController::callGameLoop(){
 		int newTick = calcNewTick();
 		if(newTick != currentTick){
 			VRGPhysicsObject hook = model->getHook();
 			currentTick = newTick;
-			if(gameState == 1){
+			if(gameState == 1){ 
+				// TODO: animateRope();
+
 				Vec3f direction = hook.getDirection();
 				if(direction.length() > 0){
-					pCtrl->calculateNewTickForPhysicsObject(hook);
-					if(calcDistanceToHook() > hook::maxDistanceValue){
+					Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
+					if(distanceVector.length() > hook::maxDistanceValue * general::scale){
 						// TODO
-						std::cout << "" << "\n";
-						hook.setDirection(0,0,0);
-					}
-					// TODO: animateRope();
-					else if(hook.getDirection().length() > 0){
+						std::cout << "max distance reached" << "\n";
+						float speed = hook.getDirection().length();
+						hook.setDirection(0,-3 * physics::gravity * general::scale,0);
+						changeCurrentState(4);
+					} else {
+					pCtrl->calculateNewTickForPhysicsObject(hook);
+					if(hook.getDirection().length() > 0){
 						bool didHit = pCtrl->collision(hook, model->getCave());
 						// TODO: falls sich Position des Hakens über mehrere Ticks nicht ändert => direction = 0,0,0
 						if(didHit){
@@ -60,20 +59,14 @@ void GameController::callGameLoop(){
 								changeCurrentState(2);
 							}
 						}
-					}
+					}}
 				}
 				if(!isGrounded()){
 					mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
 				}
-			} else if (gameState == 2){
-				// TODO: moveRope() !!!
-
+			} else if (gameState == 2){ // TODO: moveRope() !!!
 				Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 				Vec3f direction = pltformPosition - hook.getPosition();
-
-				//std::cout << "pltformPosition: " << pltformPosition << "\n";
-				//std::cout << "direction: " << direction << " , length: " << direction.length() << "\n";
-
 				if(direction.length() > physics::minDirectionLengthValue * general::scale){
 					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
 					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
@@ -81,27 +74,42 @@ void GameController::callGameLoop(){
 					hook.setPosition(pltformPosition[0], pltformPosition[1], pltformPosition[2]);
 					changeCurrentState(3);
 				}
-				// changeCurrentState(3);
-			} else if (gameState == 3){
-				// TODO
-				// movePlattform();
-				// if(finished()){
-				//	state = 1;
-				// }
+			} else if (gameState == 3){ // TODO
 				moveTowardsPlattform();
-			} else if (gameState == 4){
+			} 
+
+			// TODO: diese beiden GameStates evtl. rauslassen -> lieber Knopf um Haken + Seil zurück zu setzen
+			else if (gameState == 4){ // TODO
+				Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
+				distanceVector.normalize();
+				float dotProd = abs(distanceVector * Vec3f(0,1,0));
+				std::cout << "distanceVector: " << distanceVector << " ,dotProd: " << dotProd << "\n";
+				if(dotProd < 0.98) // TODO
+				{
+					Vec3f newDirection = hook.getDirection() - distanceVector;
+					Vec3f newPosition = hook.getPosition() + newDirection;
+					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
+				} else {
+					changeCurrentState(5);
+				}
+			} else if (gameState == 5){
+
 				// TODO: Hook kommt zum Spieler zurück
 				// Problem: Plattform ist im Weg ...
 				// -> korrekte Bewegung nachahmen
+
 				Vec3f targetPosition = mgr->getTranslation();
 				Vec3f direction = targetPosition - hook.getPosition();
 				if(direction.length() > physics::minDirectionLengthValue * general::scale){
+					
 					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
 					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
+					std::cout << "newPosition: " << newPosition << "\n";
 				} else {
+					hook.setDirection(Vec3f(0,0,0));
 					hook.setPosition(targetPosition[0], targetPosition[1], targetPosition[2]);
-					changeCurrentState(3);
-				}
+					changeCurrentState(1);
+				} 
 			}
 		}
 }
