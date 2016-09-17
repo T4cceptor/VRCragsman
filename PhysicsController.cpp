@@ -77,7 +77,8 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	Vec3f direction = obj1.getDirection();
 	float directionLength = direction.length() * speed;
 	direction.normalize();
-	Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
+	Line ray = Line(obj1.getPosition() + direction, direction);
+	// Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	// std::cout << "directionLength: " << directionLength << std::endl;
 	iAct->setLine(ray, directionLength); 
@@ -126,7 +127,7 @@ int PhysicsController::didHitPLattform(VRGPhysicsObject obj){
 	for(int i = 0; i < pltPositions::size; i++){
 		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
 		float distance =  (obj.getPosition() - scaledPosition).length();
-		if(distance < general::plattformHitDistance * general::scale){
+		if(abs(abs(obj.getPosition()[1]) - abs(scaledPosition[1])) < general::plattformHitDistance * general::scale / 10 && distance < general::plattformHitDistance * general::scale){
 			return i;
 		}
 	}

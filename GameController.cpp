@@ -42,10 +42,11 @@ void GameController::callGameLoop(){
 					if(distanceVector.length() > hook::maxDistanceValue * general::scale){
 						// TODO
 						std::cout << "max distance reached" << "\n";
-						float speed = hook.getDirection().length();
-						hook.setDirection(0,-3 * physics::gravity * general::scale,0);
-						changeCurrentState(4);
-					} else {
+						//float speed = hook.getDirection().length();
+						//hook.setDirection(0,-3 * physics::gravity * general::scale,0);
+						//changeCurrentState(4);
+					}
+
 					pCtrl->calculateNewTickForPhysicsObject(hook);
 					if(hook.getDirection().length() > 0){
 						bool didHit = pCtrl->collision(hook, model->getCave());
@@ -59,7 +60,7 @@ void GameController::callGameLoop(){
 								changeCurrentState(2);
 							}
 						}
-					}}
+					}
 				}
 				if(!isGrounded()){
 					mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
@@ -83,7 +84,7 @@ void GameController::callGameLoop(){
 				Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
 				distanceVector.normalize();
 				float dotProd = abs(distanceVector * Vec3f(0,1,0));
-				std::cout << "distanceVector: " << distanceVector << " ,dotProd: " << dotProd << "\n";
+				// std::cout << "distanceVector: " << distanceVector << " ,dotProd: " << dotProd << "\n";
 				if(dotProd < 0.98) // TODO
 				{
 					Vec3f newDirection = hook.getDirection() - distanceVector;

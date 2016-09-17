@@ -45,7 +45,7 @@ PlattformObject NodeFactory::createPlattform(std::string filePath){
 VRGPhysicsObject NodeFactory::createCave(){
 	// TODO init cave attributes
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
-	NodeRecPtr cave = createNodeFromFile("../models/BasicCaveOnly20160815.obj");
+	NodeRecPtr cave = createNodeFromFile(path::caveModel);
 	returnObj.setGeometryNode(cave);
 	// GeometryRecPtr geo = cave->getCore();
 	// GeometryRecPtr geo = dynamic_cast<Geometry *>(scene->getCore());
@@ -106,9 +106,24 @@ NodeTransitPtr NodeFactory::createNewLight(Pnt3f position, NodeRecPtr root){
 	
 	PointLightRecPtr sunLight = PointLight::create();
 	//sunLight->setAttenuation(1,0,2);
+
+	Color4f globalDiffuse = Color4f(0.6,0.6,0.6,1);
+	Color4f globalAmbient = Color4f(0.2f,0.2f,0.2f,1);
+	Color4f globalSpecular = Color4f(0.8,0.8,0.8,1);
+
+	/*
+	sunLight->setDiffuse(Color4f(1,1,1,1));
+	sunLight->setAmbient(Color4f(0.2f,0.2f,0.2f,1));
+	sunLight->setSpecular(Color4f(1,1,1,1));
+
 	sunLight->setDiffuse(Color4f(0.2,0.3,0.5,1));
 	sunLight->setAmbient(Color4f(0.3f,0.3f,0.3f,1));
 	sunLight->setSpecular(Color4f(0.5,0.6,0.8,1));
+	*/
+
+	sunLight->setDiffuse(globalDiffuse);
+	sunLight->setAmbient(globalAmbient);
+	sunLight->setSpecular(globalSpecular);
 	sunLight->setBeacon(lightPosition);
 
 	NodeRecPtr sunLightNode = Node::create();
@@ -161,7 +176,7 @@ VRGPhysicsObject NodeFactory::createHook(){
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
 
 	// TODO: auf .obj file umstellen
-	NodeRecPtr hook = createNodeFromFile("models/GoodHookTest.3ds");
+	NodeRecPtr hook = createNodeFromFile(path::hookModel);
 	returnObj.setGeometryNode(hook);
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();
 	returnObj.setTransformation(compTransform);

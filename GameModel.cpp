@@ -1,5 +1,6 @@
 #include "GameModel.h"
 #include <math.h>
+#include "Config.h"
 
 
 GameModel::GameModel(void)
@@ -90,7 +91,7 @@ template <typename T> int sgn(T val) {
 VRGPhysicsObject GameModel::createNewHook(Pnt3f pos, Vec3f direction){
 	VRGPhysicsObject newHook = nf.createHook();
 	ComponentTransformRecPtr t = newHook.getTransformation();
-	t->setScale(Vec3f(15,15,15));
+	t->setScale(hook::scaleVector);
 	t->setTranslation(pos.subZero());
 
 	newHook.setDirection(direction.getValues()[0], direction.getValues()[1], direction.getValues()[2]);
@@ -160,7 +161,7 @@ void GameModel::createScenegraph(){
 	lightedScene = nf.createEmptyVRGObj();
 
 	// TODO setup light 
-	NodeRecPtr testLight = (NodeRecPtr)nf.createNewLight(Pnt3f(540,50,540), root.getRootNode());
+	NodeRecPtr testLight = (NodeRecPtr)nf.createNewLight(configLight::positions[0], root.getRootNode());
 	staticCaveLights.push_front(testLight);
 	// Idee: 
 	// lights = nf.createLightSetup();
