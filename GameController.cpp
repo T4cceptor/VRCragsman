@@ -2,6 +2,7 @@
 #include "Config.h"
 
 extern float timeDelta;
+extern void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation);
 
 void GameController::resetGame(){
 	// TODO
@@ -19,32 +20,90 @@ void GameController::changeCurrentState(int newState){
 
 void GameController::moveHook(Vec3f direction, float speed){
 	// TODO: checken ob der Haken bereits fliegt!
+	count = 0;
+	tossVector = direction * hook::movementVectorScale * general::scale * speed;
 	prepToStop = false;
 	readyToChangeState = 0;
 	model->moveHook(
 		mgr->getTranslation() + direction * hook::movementOffsetScale * general::scale, 
 		direction * hook::movementVectorScale * general::scale * speed
 	);
+	int c = 0;
+	for (std::list<VRGPhysicsObject>::iterator it=model->getRopeTail().begin(); it != model->getRopeTail().end(); ++it){
+
+		(* it).setDirection(direction * hook::movementVectorScale * general::scale * speed);
+		(* it).setPosition(mgr->getTranslation());
+		c++;
+	}
 	std::cout << "moving hook with speed: " << speed << std::endl;
 }
+
+
 
 void GameController::callGameLoop(){
 		int newTick = calcNewTick();
 		if(newTick != currentTick){
 			VRGPhysicsObject hook = model->getHook();
 			currentTick = newTick;
+			VRGPhysicsObject ropeStart = model->getRopeStart();
 			if(gameState == 1){ 
-				// TODO: animateRope();
-
 				Vec3f direction = hook.getDirection();
 				if(direction.length() > 0){
 					Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
-					if(distanceVector.length() > hook::maxDistanceValue * general::scale){
-						// TODO
-						std::cout << "max distance reached" << "\n";
-						//float speed = hook.getDirection().length();
-						//hook.setDirection(0,-3 * physics::gravity * general::scale,0);
-						//changeCurrentState(4);
+
+					//if(tossVector.length() > 0){
+					//	//int createTick = newTick % 2;
+					//	//if(createTick == 0){
+					//		if(hookDirection.length() > 0){
+					//			ropeStart.setPosition(hook.getPosition() - hookDirection * 3 * hook::scale * general::scale);
+					//			MatrixLookAt(ropeStart.getPosition(), hook.getPosition(), Vec3f(0,1,0), ropeStart.getTransformation()->editRotation());
+					//		}
+					//	//}
+					//}
+					// Vec3f hookDirection = hook.getDirection();
+
+					// TODO: animateRope();
+
+					//if(distanceVector.length() > hook::maxDistanceValue * general::scale){
+					//	// TODO
+					//	// std::cout << "max distance reached" << "\n";
+					//	//float speed = hook.getDirection().length();
+					//	//hook.setDirection(0,-3 * physics::gravity * general::scale,0);
+					//	//changeCurrentState(4);
+					//}
+
+					Vec3f hookDirection = direction;
+					if(hookDirection.length() > 0 ){
+					std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
+					if(ropePieces.size() > 0){
+						int count = 0;
+						VRGPhysicsObject lastObj = hook;
+						Vec3f lastObjPosition = hook.getPosition();
+							for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
+								Vec3f tempPosition = (* it).getPosition();
+								count++;
+								//Vec3f toNextPieceVector = lastObj.getPosition() - (* it).getPosition();
+								//toNextPieceVector.normalize();
+								//float speed = hookDirection.length();
+								//hookDirection.normalize();
+								//Vec3f newDirection = (* it).getDirection() + toNextPieceVector;
+								//newDirection.normalize();
+								if((tempPosition - lastObjPosition).length() > 0.1){
+								// (* it).setDirection(newDirection * speed);
+									(* it).setDirection(lastObj.getDirection());
+								// (* it).addTranslation((* it).getDirection());
+									(* it).setPosition(lastObjPosition);
+								
+								//std::cout << "newDirection: " << newDirection * speed << "\n";
+								//std::cout << "newTranslation: " << (* it).getPosition() << "\n";
+									MatrixLookAt((* it).getPosition(), lastObj.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
+									
+									lastObj = (* it);
+								} else
+									break;
+								lastObjPosition = tempPosition;
+							}
+						}
 					}
 
 					pCtrl->calculateNewTickForPhysicsObject(hook);
@@ -61,6 +120,7 @@ void GameController::callGameLoop(){
 							}
 						}
 					}
+
 				}
 				if(!isGrounded()){
 					mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
@@ -69,10 +129,10 @@ void GameController::callGameLoop(){
 				Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 				Vec3f direction = pltformPosition - hook.getPosition();
 				if(direction.length() > physics::minDirectionLengthValue * general::scale){
-					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
-					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
+					//Vec3f newPosition = hook.getPosition() + (direction * 0.02);
+					hook.setPosition(hook.getPosition() + (direction * 0.02));
 				} else {
-					hook.setPosition(pltformPosition[0], pltformPosition[1], pltformPosition[2]);
+					hook.setPosition(pltformPosition);
 					changeCurrentState(3);
 				}
 			} else if (gameState == 3){ // TODO
@@ -89,7 +149,7 @@ void GameController::callGameLoop(){
 				{
 					Vec3f newDirection = hook.getDirection() - distanceVector;
 					Vec3f newPosition = hook.getPosition() + newDirection;
-					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
+					hook.setPosition(newPosition);
 				} else {
 					changeCurrentState(5);
 				}
@@ -103,9 +163,9 @@ void GameController::callGameLoop(){
 				Vec3f direction = targetPosition - hook.getPosition();
 				if(direction.length() > physics::minDirectionLengthValue * general::scale){
 					
-					Vec3f newPosition = hook.getPosition() + (direction * 0.02);
-					hook.setPosition(newPosition[0], newPosition[1], newPosition[2]);
-					std::cout << "newPosition: " << newPosition << "\n";
+					// Vec3f newPosition = hook.getPosition() + (direction * 0.02);
+					hook.setPosition(hook.getPosition() + (direction * 0.02));
+					// std::cout << "newPosition: " << newPosition << "\n";
 				} else {
 					hook.setDirection(Vec3f(0,0,0));
 					hook.setPosition(targetPosition[0], targetPosition[1], targetPosition[2]);

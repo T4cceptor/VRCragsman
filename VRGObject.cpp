@@ -31,6 +31,10 @@ void VRGObject::setPosition(float x, float y, float z){
 	return objectTransformation->setTranslation(Vec3f(x,y,z));
 }
 
+void VRGObject::setPosition(Vec3f newPosition){
+	setPosition(newPosition[0], newPosition[1], newPosition[2]);
+}
+
 void VRGObject::addTranslation(Vec3f addVec){
 	objectTransformation->setTranslation(getPosition() + addVec);
 }

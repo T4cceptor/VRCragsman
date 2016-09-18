@@ -9,6 +9,7 @@ namespace config{
 namespace path{
 	const std::string caveModel = "../models/BasicCaveOnly20160815.obj";
 	const std::string hookModel = "../models/hookwithknot.obj";
+	const std::string ropeModel = "../models/ropeonly.obj";
 }
 
 namespace configLight{
@@ -50,19 +51,24 @@ namespace general {
 
 namespace cave{
 	const Vec3f translationVector = Vec3f(370,0,337); // Anf�nglicher Translations Vektor
-	// alte Werte: Vec3f(5100,300,5100);
 	const Vec3f scaleVector = Vec3f(10,10,10); // Skalierung des 3D Models
-
 	const float velocityReduction = 0.2; // gibt Prozentwert an, auf den die Geschwindigkeit eines auftreffenden Objekts veringert wird
-
 }
 
 namespace hook{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
-	const Vec3f scaleVector = Vec3f(45,45,45); // Skalierung des 3D Models
+	const float scale = 8;
+	const Vec3f scaleVector = Vec3f(1,1,1) * scale; // Skalierung des 3D Models
+
 	const float movementOffsetScale = 15; // Offset Skalierung wenn Hook geworfen wird
 	const float movementVectorScale = -25; // 
 	const float maxDistanceValue = 2000;
+}
+
+namespace rope{
+	const Vec3f translationVector = Vec3f(0,0,0);
+	const Vec3f scaleVector = Vec3f(1,1,0.5) * 8;
+
 }
 
 namespace physics{

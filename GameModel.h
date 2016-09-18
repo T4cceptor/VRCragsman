@@ -36,11 +36,11 @@ public:
 	//Init
 	void initGameModel(PhysicsController * pc);
 	void createScenegraph();
-	void rotateCave(float x, float y, float z, float rad);  
-	void createNewLight(Pnt3f pos);
 
 	// Physics
 	PhysicsController physicCtrl;
+	void createRopePiece();
+
 
 private:
 	// Init

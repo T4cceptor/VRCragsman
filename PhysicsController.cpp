@@ -9,6 +9,7 @@ PhysicsController::PhysicsController(void)
 {
 	model = * new PhysicsModel();
 	std::cout << "PhysicsController contructor called" << std::endl;
+
 	// Werte in Config.h einstellen
 	heightDimension = physics::heightDimension;
 	floorValue = physics::floorValue * general::scale;
@@ -23,29 +24,22 @@ PhysicsController::PhysicsController(void)
 	startTime = clock();
 }
 
-PhysicsController::~PhysicsController(void)
-{
-	// physicThread1.kill();
-}
+PhysicsController::~PhysicsController(void){}
 
-void PhysicsController::registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable){
-	// TODO
-	// VRGLogger::logMessage("Registered new physic object ");
-
-	if(isMoveable){
-		std::cout << "added new physics object" << std::endl;
-		model.addMoveableObject(obj);
-	}
-}
+// deprecated - use "calculateNewTickForPhysicsObject" instead
+//void PhysicsController::registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable){
+//	// TODO
+//	// VRGLogger::logMessage("Registered new physic object ");
+//	if(isMoveable){
+//		std::cout << "added new physics object" << std::endl;
+//		model.addMoveableObject(obj);
+//	}
+//}
 
 Vec3f PhysicsController::getReflectionVector(){
 	return reflectionVector;
 }
 
-// registerNewPhysicsObject
-//void PhysicsController::registerNewMoveableObject(VRGPhysicsObject obj){
-//	VRGLogger::logMessage("Registered new moveable physic object ");
-//}
 void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation){
 		// TODO Performance upgrade!!!
 //		std::cout << "calculating new look at: " << at << std::endl;
@@ -77,7 +71,9 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	Vec3f direction = obj1.getDirection();
 	float directionLength = direction.length() * speed;
 	direction.normalize();
-	Line ray = Line(obj1.getPosition() + direction, direction);
+	// Line ray = Line(obj1.getPosition() + direction, direction);
+	Line ray = Line(obj1.getPosition(), direction);
+
 	// Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	// std::cout << "directionLength: " << directionLength << std::endl;
@@ -114,10 +110,13 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 			obj.addTranslation(itemDirection * speed); 
 			Vec3f newDirection = itemDirection - itemDirection * speedloss;
 			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
-			obj.setLookAt(newDirection);
+			
 			if(newDirection.length() < minDirectionLengthValue){
 				newDirection = Vec3f(0,0,0);
+			} else {
+				obj.setLookAt(newDirection);
 			}
+
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
 			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());
 		}
@@ -134,98 +133,94 @@ int PhysicsController::didHitPLattform(VRGPhysicsObject obj){
 	return -1;
 }
 
-void PhysicsController::calculateNewTick(){
-	clock_t now = clock();
-	clock_t delta = now - startTime;
-	// int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
-	int newTick = int(static_cast<int>(delta) / 25) % 25;
-
-	//std::cout << "calculating new tick: " << newTick << std::endl;
-	//std::cout << "MovableItems: " << model.getMovableItems().size() << std::endl;
-
-	// Simulates movement
-	if(newTick != tick && !model.getMovableItems().empty()){
-		std::list<VRGPhysicsObject> movObj = model.getMovableItems(); // TODO: Performance upgrade!?
-		// besser wenn die items einzeln angesprochen werden?
-		// evtl. sogar als static function ? -> !!!
-		// Idee: calculateNewTickForObject(VRGPhysicsObject item)
-		// => nur einen Hook erzeugen und diesen bewegen! => Performance + Memory Verbesserung
-	for (std::list<VRGPhysicsObject>::iterator it = movObj.begin(); it != movObj.end(); ++it){
-		VRGPhysicsObject poPtr = (* it);
-		calculateNewTickForPhysicsObject(poPtr);
-
-		/*
-		Vec3f itemDirection = poPtr.getDirection();
-		Vec3f itemPosition = poPtr.getPosition();
-
-		//if(itemPosition[2] > 0 && itemDirection[2] > 0){
-		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
-			if(tick == 0 && false){
-				std::cout << "object direction: " <<  itemDirection[0] << "," << itemDirection[1] << "," << itemDirection[2] << " - " << now << std::endl;
-				std::cout << "object position: " <<  itemPosition[0] << "," << itemPosition[1] << "," << itemPosition[2] << " - " << now << std::endl;
-			}
-
-			(* it).addTranslation(itemDirection * speed); 
-			
-			Vec3f newDirection = itemDirection - itemDirection * speedloss;
-			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
-			if(newDirection.length() < minDirectionLengthValue){
-				newDirection = Vec3f(0,0,0);
-			}
-
-			poPtr.setDirection(newDirection[0],newDirection[1],newDirection[2]);
-			if(tick == 0 && false)
-				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << tick << std::endl;
-
-			// TODO: Rotation 
-			// ComponentTransformRecPtr t = ComponentTransformRecPtr ((* it).getTransformation());
-			// t->setRotation(MatrixLookAtResult(t->editMatrix(),itemPosition, itemPosition + itemDirection, Vec3f(0,0,1)));
-			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, (* it).getTransformation()->editRotation());
-			
-		}
-		*/
-
-		/************************** Old Code ******************************/
-			/*Matrix m = Matrix();
-			m.setIdentity();
-			MatrixLookAtResult(m, itemPosition, itemPosition + itemDirection, Vec3f(0,0,1));
-			Quaternion q; 
-			Vector3 c = Vector3.Cross(curUp, targetUp); 
-			float d = Vector3.Dot(curUp, targetUp); 
-			float s = (float) Math.Sqrt((1.0f + d)*2.0f); 
-			float rs = 1.0f/s; 
-			q.X = c.X*rs; 
-			q.Y = c.Y*rs; 
-			q.Z = c.Z*rs; 
-			q.W = s*0.5f; 
-			
-			q = q*Rotation; 
-			
-			Rotation = Quaternion.Slerp(Rotation, q, 0.1f * distanceScalar); 
-			*/
-
-		// VRGLogger::logMessage("new tick calculated");
-		// std::cout << "before critical point: if" << std::endl;
-
-		// TODO: Hit-Box check!
-		// if(needCollisionCheck && !didHitAnything((* it))){
-		//if(float((* it).getPosition().getValues()[2]) > -10.0f){ // TODO: -10 wird nicht der richtige Wert sein!
-		//	(* it).setDirection(itemDirection.getValues()[0], itemDirection.getValues()[1], itemDirection.getValues()[2] - 1);
-		//	// TODO: direction �ndern, Schwerkraft
-		//	// hier wird z value der Direction ge�ndert
-		//}
-
-		/*
-		if((* it).speed > 0.5)
-			(* it).setSpeed((* it).speed * 0.5);
-		else
-			(* it).setSpeed(0);
-		*/
-		// } else {
-		// TODO
-		// }
-		// itemDirection = 0;
-	}
-	tick = newTick;
-	}
-}
+// deprecated - use "calculateNewTickForPhysicsObject" instead
+//void PhysicsController::calculateNewTick(){
+//	clock_t now = clock();
+//	clock_t delta = now - startTime;
+//
+//	int newTick = int(static_cast<int>(delta) / 25) % 25;
+//	if(newTick != tick && !model.getMovableItems().empty()){
+//		std::list<VRGPhysicsObject> movObj = model.getMovableItems(); // TODO: Performance upgrade!?
+//		// besser wenn die items einzeln angesprochen werden?
+//		// evtl. sogar als static function ? -> !!!
+//		// Idee: calculateNewTickForObject(VRGPhysicsObject item)
+//		// => nur einen Hook erzeugen und diesen bewegen! => Performance + Memory Verbesserung
+//	for (std::list<VRGPhysicsObject>::iterator it = movObj.begin(); it != movObj.end(); ++it){
+//		VRGPhysicsObject poPtr = (* it);
+//		calculateNewTickForPhysicsObject(poPtr);
+//
+//		/*
+//		Vec3f itemDirection = poPtr.getDirection();
+//		Vec3f itemPosition = poPtr.getPosition();
+//
+//		//if(itemPosition[2] > 0 && itemDirection[2] > 0){
+//		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
+//			if(tick == 0 && false){
+//				std::cout << "object direction: " <<  itemDirection[0] << "," << itemDirection[1] << "," << itemDirection[2] << " - " << now << std::endl;
+//				std::cout << "object position: " <<  itemPosition[0] << "," << itemPosition[1] << "," << itemPosition[2] << " - " << now << std::endl;
+//			}
+//
+//			(* it).addTranslation(itemDirection * speed); 
+//			
+//			Vec3f newDirection = itemDirection - itemDirection * speedloss;
+//			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
+//			if(newDirection.length() < minDirectionLengthValue){
+//				newDirection = Vec3f(0,0,0);
+//			}
+//
+//			poPtr.setDirection(newDirection[0],newDirection[1],newDirection[2]);
+//			if(tick == 0 && false)
+//				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << tick << std::endl;
+//
+//			// TODO: Rotation 
+//			// ComponentTransformRecPtr t = ComponentTransformRecPtr ((* it).getTransformation());
+//			// t->setRotation(MatrixLookAtResult(t->editMatrix(),itemPosition, itemPosition + itemDirection, Vec3f(0,0,1)));
+//			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, (* it).getTransformation()->editRotation());
+//			
+//		}
+//		*/
+//
+//		/************************** Old Code ******************************/
+//			/*Matrix m = Matrix();
+//			m.setIdentity();
+//			MatrixLookAtResult(m, itemPosition, itemPosition + itemDirection, Vec3f(0,0,1));
+//			Quaternion q; 
+//			Vector3 c = Vector3.Cross(curUp, targetUp); 
+//			float d = Vector3.Dot(curUp, targetUp); 
+//			float s = (float) Math.Sqrt((1.0f + d)*2.0f); 
+//			float rs = 1.0f/s; 
+//			q.X = c.X*rs; 
+//			q.Y = c.Y*rs; 
+//			q.Z = c.Z*rs; 
+//			q.W = s*0.5f; 
+//			
+//			q = q*Rotation; 
+//			
+//			Rotation = Quaternion.Slerp(Rotation, q, 0.1f * distanceScalar); 
+//			*/
+//
+//		// VRGLogger::logMessage("new tick calculated");
+//		// std::cout << "before critical point: if" << std::endl;
+//
+//		// TODO: Hit-Box check!
+//		// if(needCollisionCheck && !didHitAnything((* it))){
+//		//if(float((* it).getPosition().getValues()[2]) > -10.0f){ // TODO: -10 wird nicht der richtige Wert sein!
+//		//	(* it).setDirection(itemDirection.getValues()[0], itemDirection.getValues()[1], itemDirection.getValues()[2] - 1);
+//		//	// TODO: direction �ndern, Schwerkraft
+//		//	// hier wird z value der Direction ge�ndert
+//		//}
+//
+//		/*
+//		if((* it).speed > 0.5)
+//			(* it).setSpeed((* it).speed * 0.5);
+//		else
+//			(* it).setSpeed(0);
+//		*/
+//		// } else {
+//		// TODO
+//		// }
+//		// itemDirection = 0;
+//	}
+//	tick = newTick;
+//	}
+//}

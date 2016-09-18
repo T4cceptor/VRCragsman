@@ -31,6 +31,8 @@ private:
 	PhysicsController * pCtrl;
 	OSGCSM::CAVESceneManager *mgr;
 
+	Vec3f tossVector;
+
 	int currentTick;
 	int readyToChangeState;
 	int gameState;
@@ -43,5 +45,7 @@ private:
 	void changeCurrentState(int newState);
 
 	void moveTowardsPlattform();
+
+	int count;
 };
 

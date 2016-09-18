@@ -29,6 +29,7 @@ public:
 	Quaternion getRotation();
 	Vec3f getPosition();
 	void setPosition(float x, float y, float z);
+	void setPosition(Vec3f newPosition);
 
 	int getId();
 

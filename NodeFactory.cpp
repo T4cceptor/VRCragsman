@@ -6,7 +6,6 @@
 
 */
 
-
 NodeFactory::NodeFactory(void){}
 
 NodeFactory::~NodeFactory(void){}
@@ -23,7 +22,6 @@ NodeTransitPtr createNodeFromFile(std::string filePath){
 }
 
 PlattformObject NodeFactory::createPlattform(std::string filePath){
-
 	PlattformObject returnObj = * new PlattformObject();
 	NodeRecPtr plattforms = createNodeFromFile(filePath);
 	returnObj.setGeometryNode(plattforms);
@@ -42,33 +40,45 @@ PlattformObject NodeFactory::createPlattform(std::string filePath){
 	return returnObj;
 }
 
-VRGPhysicsObject NodeFactory::createCave(){
-	// TODO init cave attributes
+VRGPhysicsObject NodeFactory::createRopePiece(){
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
-	NodeRecPtr cave = createNodeFromFile(path::caveModel);
-	returnObj.setGeometryNode(cave);
-	// GeometryRecPtr geo = cave->getCore();
-	// GeometryRecPtr geo = dynamic_cast<Geometry *>(scene->getCore());
-	GeometryRecPtr geo = dynamic_cast<Geometry *>(cave->getCore());
-	createSharedIndex(geo);
-	// calcFaceNormals(geo);
-	calcVertexNormals(geo);
-    // calcVertexNormals(geo, osgDegree2Rad(30));
+	NodeRecPtr ropePiece = createNodeFromFile(path::ropeModel);
+	returnObj.setGeometryNode(ropePiece);
 
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();
 	returnObj.setTransformation(compTransform);
 
-	// TODO: implement scaling factor
+	// GeometryRecPtr geo = dynamic_cast<Geometry *>(ropePiece->getCore());
+	// createSharedIndex(geo);
+	// calcVertexNormals(geo);
+	// calcVertexNormals(geo, osgDegree2Rad(30));
+	// calcFaceNormals(geo);
+
+	compTransform->setScale(rope::scaleVector * general::scale);
+    compTransform->setTranslation(rope::translationVector * general::scale);
+
+	NodeRecPtr transNode = makeNodeFor(compTransform);
+	transNode->addChild(ropePiece);
+	returnObj.setRootNode(transNode);
+	return returnObj;
+}
+
+VRGPhysicsObject NodeFactory::createCave(){
+	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
+	NodeRecPtr cave = createNodeFromFile(path::caveModel);
+	returnObj.setGeometryNode(cave);
+
+	GeometryRecPtr geo = dynamic_cast<Geometry *>(cave->getCore());
+	createSharedIndex(geo);
+	calcVertexNormals(geo);
+    // calcVertexNormals(geo, osgDegree2Rad(30));
+	// calcFaceNormals(geo);
+
+	ComponentTransformRecPtr compTransform = ComponentTransform::create();
+	returnObj.setTransformation(compTransform);
+
 	compTransform->setScale(cave::scaleVector * general::scale);
     compTransform->setTranslation(cave::translationVector * general::scale);
-
-	// TODO
-	// compTransform->setCenter
-	// compTransform->setMatrix
-	// bt->setRotation(Quaternion(Vec3f(1,0,0),osgDegree2Rad(270)+0.001f*time));
-	// compTransform->setRotation(Quaternion(Vec3f(1,0,0),osgDegree2Rad(0)));
-	// compTransform->setScale
-	// compTransform->setTranslation
 
 	NodeRecPtr transNode = makeNodeFor(compTransform);
 	transNode->addChild(cave);
@@ -93,20 +103,17 @@ VRGPhysicsObject NodeFactory::createRoot(){
 }
 
 NodeTransitPtr NodeFactory::createNewLight(Pnt3f position, NodeRecPtr root){
-
 	NodeRecPtr returnPtr = Node::create();
 	returnPtr->setCore(Group::create());
-
 	NodeRecPtr lightPosition = Node::create();
 	ComponentTransformRecPtr ct = ComponentTransform::create();
 	ct->setTranslation(position.subZero());
 	lightPosition->setCore(ct);
 	returnPtr->addChild(lightPosition);
 
-	
 	PointLightRecPtr sunLight = PointLight::create();
-	//sunLight->setAttenuation(1,0,2);
 
+	//sunLight->setAttenuation(1,0,2);
 	Color4f globalDiffuse = Color4f(0.6,0.6,0.6,1);
 	Color4f globalAmbient = Color4f(0.2f,0.2f,0.2f,1);
 	Color4f globalSpecular = Color4f(0.8,0.8,0.8,1);
@@ -132,113 +139,20 @@ NodeTransitPtr NodeFactory::createNewLight(Pnt3f position, NodeRecPtr root){
 	root->addChild(returnPtr);
 
 	return NodeTransitPtr(sunLightNode);
-	/*
-	ComponentTransformRecPtr ct = ComponentTransform::create();
-	ct->setTranslation(Vec3f(0,-2,0));
-	ct->setRotation(Quaternion(Vec3f(1,0,0),osgDegree2Rad(90)));
-	/*
-	beachTrans = Node::create();
-	beachTrans->setCore(ct);
-
-	PointLightRecPtr sunLight = PointLight::create();
-	//sunLight->setAttenuation(1,0,2);
-
-	//color information
-	sunLight->setDiffuse(Color4f(1,1,1,1));
-	sunLight->setAmbient(Color4f(0.2f,0.2f,0.2f,1));
-	sunLight->setSpecular(Color4f(1,1,1,1));
-
-	sunLight->setBeacon(sunChild); //attach to the sun node use this node as position beacon
-
-	root->setCore(sunLight);
-	*/
-
-	/*
-		DirectionalLightRecPtr dirLight = DirectionalLight::create();
-	dirLight->setDirection(1,1,-1);
-
-	//color information
-	dirLight->setDiffuse(Color4f(1,1,1,1));
-	dirLight->setAmbient(Color4f(0.2f,0.2f,0.2f,1));
-	dirLight->setSpecular(Color4f(1,1,1,1));
-
-
-	//wrap the root, cause only nodes below the lights will be lit
-	NodeRecPtr ueberroot = makeNodeFor(dirLight);
-	ueberroot->addChild(root);
-
-	*/
-
 }
 
 VRGPhysicsObject NodeFactory::createHook(){
-	// TODO init cave attributes
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
-
-	// TODO: auf .obj file umstellen
 	NodeRecPtr hook = createNodeFromFile(path::hookModel);
 	returnObj.setGeometryNode(hook);
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();
 	returnObj.setTransformation(compTransform);
-	// compTransform->setTranslation(Vec3f(100,20,100));
-
-	// TODO
-	// compTransform->setCenter
-	// compTransform->setMatrix
-	// compTransform->setRotation
-	// compTransform->setScale
-	// compTransform->setTranslation
 
 	NodeRecPtr transNode = makeNodeFor(compTransform);
 	transNode->addChild(hook);
 	returnObj.setRootNode(transNode);
 	return returnObj;
 }
-
-
-
-/*
-NodeTransitPtr loadCave(NodeRecPtr root, std::string filePath){ // "models/vrcave2.3ds"
-	ComponentTransformRecPtr caveTransform = ComponentTransform::create();
-	NodeRecPtr palmTrans = makeNodeFor(caveTransform);
-	createNodeFromFile(palmTrans, filePath);
-
-	// TODO cave richtig aufstellen
-
-	return NodeTransitPtr(palmTrans);
-}
-*/
-
-/*
-NodeTransitPtr loadHook(NodeRecPtr root, std::string filePath){ // "models/hookv2.3ds"
-	ComponentTransformRecPtr hookTransform = ComponentTransform::create();
-	NodeRecPtr hookTransNode = makeNodeFor(hookTransform);
-	createNodeFromFile(hookTransNode, filePath);
-	return NodeTransitPtr(hookTransNode);
-}
-*/
-
-/*
-NodeTransitPtr createScene1(){
-	NodeRecPtr groupNode1 = Node::create();
-	groupNode1->setCore(Group::create());
-
-	NodeRecPtr boxChild = makeBox(5,4,4,1,1,1);
-	NodeRecPtr beach = makePlane(30, 30, 1, 1);
-	NodeRecPtr teapot = makeTeapot(10, 2.0);
-
-	GeometryRecPtr sunGeo = makeSphereGeo(2, 3);
-	NodeRecPtr sunChild = Node::create();
-	sunChild->setCore(sunGeo);
-
-	groupNode1->addChild(sunChild);
-	groupNode1->addChild(boxChild);
-	groupNode1->addChild(beach);
-	groupNode1->addChild(teapot);
-
-	return NodeTransitPtr(groupNode1);
-}
-*/
 
 /* old code
 NodeTransitPtr NodeFactory::createNewType1Scenegraph() {

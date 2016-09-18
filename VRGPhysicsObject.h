@@ -18,8 +18,6 @@ public:
 
 	float getSpeed();
 
-	
-
 private:
 	Vec3f * direction;
 	Vec3f * lookAt;

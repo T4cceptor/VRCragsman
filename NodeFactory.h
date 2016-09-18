@@ -59,5 +59,7 @@ public:
 	NodeTransitPtr createNewLight(Pnt3f position, NodeRecPtr root);
 
 	VRGObject createEmptyVRGObj();
+
+	VRGPhysicsObject createRopePiece();
 };
 
