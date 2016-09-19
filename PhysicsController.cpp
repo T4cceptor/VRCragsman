@@ -126,7 +126,7 @@ int PhysicsController::didHitPLattform(VRGPhysicsObject obj){
 	for(int i = 0; i < pltPositions::size; i++){
 		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
 		float distance =  (obj.getPosition() - scaledPosition).length();
-		if(abs(abs(obj.getPosition()[1]) - abs(scaledPosition[1])) < general::plattformHitDistance * general::scale / 10 && distance < general::plattformHitDistance * general::scale){
+		if(abs(obj.getPosition()[1] - scaledPosition[1]) < general::plattformHitDistance * general::scale / 5 && distance < general::plattformHitDistance * general::scale){
 			return i;
 		}
 	}

@@ -5,11 +5,6 @@
 - createNode sinnvoll verallgemeinern - ?
 
 */
-
-NodeFactory::NodeFactory(void){}
-
-NodeFactory::~NodeFactory(void){}
-
 NodeTransitPtr createNodeFromFile(NodeRecPtr root, std::string filePath){
 	NodeRecPtr cave = SceneFileHandler::the()->read(filePath.c_str());
 	root->addChild(cave);
@@ -19,6 +14,16 @@ NodeTransitPtr createNodeFromFile(NodeRecPtr root, std::string filePath){
 NodeTransitPtr createNodeFromFile(std::string filePath){
 	NodeRecPtr cave = SceneFileHandler::the()->read(filePath.c_str());
 	return NodeTransitPtr(cave);
+}
+
+NodeFactory::NodeFactory(void){
+
+}
+
+NodeFactory::~NodeFactory(void){}
+
+void NodeFactory::initNodeFactory(){
+	ropeBlueprint = createNodeFromFile(path::ropeModel);
 }
 
 PlattformObject NodeFactory::createPlattform(std::string filePath){
@@ -42,7 +47,7 @@ PlattformObject NodeFactory::createPlattform(std::string filePath){
 
 VRGPhysicsObject NodeFactory::createRopePiece(){
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
-	NodeRecPtr ropePiece = createNodeFromFile(path::ropeModel);
+	NodeRecPtr ropePiece = OSG::cloneTree(ropeBlueprint);
 	returnObj.setGeometryNode(ropePiece);
 
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();

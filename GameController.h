@@ -26,10 +26,16 @@ public:
 	void moveHook(Vec3f direction, float speed);
 	void resetGame();
 
+	void resetHook();
+	void resetRope();
+	void startGame();
+
 private:
 	GameModel * model;
 	PhysicsController * pCtrl;
 	OSGCSM::CAVESceneManager *mgr;
+
+	bool hookFlying;
 
 	Vec3f tossVector;
 
@@ -47,5 +53,8 @@ private:
 	void moveTowardsPlattform();
 
 	int count;
+	int currentTickCount;
+
+	int countBounce;
 };
 

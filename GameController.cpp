@@ -19,8 +19,13 @@ void GameController::changeCurrentState(int newState){
 }
 
 void GameController::moveHook(Vec3f direction, float speed){
+	
+	//if(hookFlying)
+	//	return;
 	// TODO: checken ob der Haken bereits fliegt!
+	countBounce = 0;
 	count = 0;
+	currentTickCount = 0;
 	tossVector = direction * hook::movementVectorScale * general::scale * speed;
 	prepToStop = false;
 	readyToChangeState = 0;
@@ -28,21 +33,40 @@ void GameController::moveHook(Vec3f direction, float speed){
 		mgr->getTranslation() + direction * hook::movementOffsetScale * general::scale, 
 		direction * hook::movementVectorScale * general::scale * speed
 	);
-	int c = 0;
-	for (std::list<VRGPhysicsObject>::iterator it=model->getRopeTail().begin(); it != model->getRopeTail().end(); ++it){
-
-		(* it).setDirection(direction * hook::movementVectorScale * general::scale * speed);
-		(* it).setPosition(mgr->getTranslation());
-		c++;
-	}
+	//int c = 0;
+	//for (std::list<VRGPhysicsObject>::iterator it=model->getRopeTail().begin(); it != model->getRopeTail().end(); ++it){
+	//	(* it).setDirection(direction * hook::movementVectorScale * general::scale * speed);
+	//	(* it).setPosition(mgr->getTranslation());
+	//	c++;
+	//}
 	std::cout << "moving hook with speed: " << speed << std::endl;
 }
 
+void GameController::resetRope() {
+	std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
+	for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
+		(* it).setDirection(Vec3f(0,0,0));
+		// TODO
+		(* it).setPosition(mgr->getTranslation() + Vec3f(0,0,0));
+		(* it).getTransformation()->setScale(Vec3f(1,1,1));
+	}
+}
 
+void GameController::resetHook(){
+	// TODO: direction = currentLookAt
+	model->getHook().setPosition(mgr->getTranslation() + Vec3f(0,0,0));
+	resetRope();
+}
+
+void GameController::startGame(){
+	resetHook();
+	changeCurrentState(1);
+}
 
 void GameController::callGameLoop(){
 		int newTick = calcNewTick();
 		if(newTick != currentTick){
+			currentTickCount++;
 			VRGPhysicsObject hook = model->getHook();
 			currentTick = newTick;
 			VRGPhysicsObject ropeStart = model->getRopeStart();
@@ -80,6 +104,8 @@ void GameController::callGameLoop(){
 						VRGPhysicsObject lastObj = hook;
 						Vec3f lastObjPosition = hook.getPosition();
 							for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
+								if(count == currentTickCount)
+									break;
 								Vec3f tempPosition = (* it).getPosition();
 								count++;
 								//Vec3f toNextPieceVector = lastObj.getPosition() - (* it).getPosition();
@@ -91,9 +117,13 @@ void GameController::callGameLoop(){
 								if((tempPosition - lastObjPosition).length() > 0.1){
 								// (* it).setDirection(newDirection * speed);
 									(* it).setDirection(lastObj.getDirection());
+									
+									
 								// (* it).addTranslation((* it).getDirection());
-									(* it).setPosition(lastObjPosition);
-								
+								(* it).setPosition(lastObjPosition);
+								Vec3f positionVector = lastObj.getPosition() - (* it).getPosition();
+								Vec3f newScale = Vec3f(rope::scaleVector[0] * general::scale,rope::scaleVector[1] * general::scale,positionVector.length());
+								(* it).getTransformation()->setScale(newScale);
 								//std::cout << "newDirection: " << newDirection * speed << "\n";
 								//std::cout << "newTranslation: " << (* it).getPosition() << "\n";
 									MatrixLookAt((* it).getPosition(), lastObj.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
@@ -112,11 +142,17 @@ void GameController::callGameLoop(){
 						// TODO: falls sich Position des Hakens über mehrere Ticks nicht ändert => direction = 0,0,0
 						if(didHit){
 							int pltformHit = pCtrl->didHitPLattform(hook);
-							if(pltformHit != -1){
+							if(pltformHit != -1 && currentPltForm != pltformHit){ // Plattform getroffen => Seil spannen
 								std::cout << "plattform hit" << std::endl;
 								currentPltForm = pltformHit;
 								hook.setDirection(Vec3f(0,0,0));
+								Vec3f cavePosition = mgr->getTranslation() - Vec3f(0,1,0);
+								Vec3f lookDirection =  hook.getPosition() - cavePosition;
+								MatrixLookAt(cavePosition, hook.getPosition() + lookDirection, Vec3f(0,1,0), hook.getTransformation()->editRotation());
 								changeCurrentState(2);
+							} else{
+								// es wurde nur die Cave getroffen, keine Plattform
+								countBounce++;
 							}
 						}
 					}
@@ -125,16 +161,75 @@ void GameController::callGameLoop(){
 				if(!isGrounded()){
 					mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
 				}
-			} else if (gameState == 2){ // TODO: moveRope() !!!
+			} else if (gameState == 2){ 
+				// TODO: moveRope() !!!
 				Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 				Vec3f direction = pltformPosition - hook.getPosition();
 				if(direction.length() > physics::minDirectionLengthValue * general::scale){
-					//Vec3f newPosition = hook.getPosition() + (direction * 0.02);
 					hook.setPosition(hook.getPosition() + (direction * 0.02));
-				} else {
+				}
+				int countRopePieces = currentTickCount;
+				Vec3f hookPosition = hook.getPosition();
+				Vec3f mgrPosition = mgr->getTranslation() - Vec3f(0,1,0);
+				Vec3f mgrHook = hookPosition - mgrPosition;
+				std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
+				VRGPhysicsObject lastObj = hook;
+				Vec3f lastObjPosition = hook.getPosition();
+				int count = 0;
+				for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
+					count++;
+					if(count > countRopePieces){
+						return;
+					}
+					Vec3f targetPosition = mgrPosition + (mgrHook / countRopePieces) * (countRopePieces - count);
+					Vec3f currentPosition = (* it).getPosition();
+					Vec3f targetVector = targetPosition - currentPosition;
+					if(targetVector.length() > 0.05){
+						
+					} else {
+						count++;
+						MatrixLookAt((* it).getPosition(), hook.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
+					}
+
+					Vec3f rpPosition = (* it).getPosition();
+					Vec3f mgrRp = rpPosition - mgrPosition;
+					Vec3f rpHook = hookPosition - rpPosition;
+					rpHook.normalize();
+					mgrRp.normalize();
+					mgrHook.normalize();
+					
+					Vec3f mgrUp = mgrHook.cross(mgrRp);
+					mgrUp.normalize();
+					Vec3f mgrRight = mgrUp.cross(mgrHook) ;
+					mgrRight.normalize();
+					mgrRight = mgrRight + mgrRp;
+					//Vec3f lookAtRopePiece = lastObjPosition - rpPosition;
+					//lookAtRopePiece.normalize();
+					float dotProd = mgrHook * rpHook;
+					if(dotProd < 0.01){
+						std::cout << "dotProd: " << dotProd << "\n";
+						count++;
+						MatrixLookAt((* it).getPosition(), hook.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
+					}
+					else {
+						Vec3f positionVector = lastObj.getPosition() - rpPosition;
+						Vec3f newScale = Vec3f(rope::scaleVector[0] * general::scale,rope::scaleVector[1] * general::scale,positionVector.length());
+						(* it).getTransformation()->setScale(newScale * 0.75);
+						(* it).setPosition(rpPosition - mgrRight * 3);
+						MatrixLookAt((* it).getPosition(), lastObj.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
+					}
+					lastObj = (* it);
+					lastObjPosition = rpPosition;
+				}
+
+				if(direction.length() < physics::minDirectionLengthValue * general::scale && count >= 200){
 					hook.setPosition(pltformPosition);
+					
+
 					changeCurrentState(3);
 				}
+				// TODO: changeState(3) Bedingung ändern, Seil muss auch entsprechend animiert werden
+
 			} else if (gameState == 3){ // TODO
 				moveTowardsPlattform();
 			} 
@@ -182,6 +277,7 @@ void GameController::moveTowardsPlattform(){
 		mgr->setTranslation(mgr->getTranslation() + direction * 0.02);
 	} else {
 		mgr->setTranslation(pltformPosition);
+		resetHook();
 		changeCurrentState(1);
 	}
 }
@@ -251,4 +347,5 @@ void GameController::init(OSGCSM::CAVESceneManager* newMgr){
 	startTime = clock();
 	prepToStop = false;
 	currentPltForm = 0;
+	hookFlying = false;
 }

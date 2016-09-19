@@ -61,5 +61,9 @@ public:
 	VRGObject createEmptyVRGObj();
 
 	VRGPhysicsObject createRopePiece();
+
+	NodeRecPtr ropeBlueprint;
+
+	void initNodeFactory();
 };
 

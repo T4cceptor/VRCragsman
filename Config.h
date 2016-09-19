@@ -47,6 +47,8 @@ namespace general {
 	const float minDistanceToFloor = 50.0f;
 	const float hitDistance = 20.0f;
 	const int ticksPerSecond = 50;
+
+	const int maxCount = 100;
 }
 
 namespace cave{
@@ -68,7 +70,7 @@ namespace hook{
 namespace rope{
 	const Vec3f translationVector = Vec3f(0,0,0);
 	const Vec3f scaleVector = Vec3f(1,1,0.5) * 8;
-
+	const int pieces = 200;
 }
 
 namespace physics{

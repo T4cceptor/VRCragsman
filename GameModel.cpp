@@ -74,11 +74,8 @@ PlattformObject GameModel::getPlattformWithId(){
 /** Initialize Model and create Scenegraph functions **/
 void GameModel::initGameModel(PhysicsController * pc){
 	nf = * new NodeFactory();
+	nf.initNodeFactory();
 	physicCtrl = *pc;
-	// std::thread physicThread1(&physicCtrl.calculateNewTick, physicCtrl);
-	// physicThread1.join();
-
-	createScenegraph();
 }
 
 
@@ -148,7 +145,7 @@ void GameModel::createScenegraph(){
 	ropeStart = nf.createRopePiece();
 	lightedScene.addChild(ropeStart);
 
-	for(int i = 0; i < 100; i++){
+	for(int i = 0; i < rope::pieces; i++){
 		ropePieces.push_back(nf.createRopePiece());
 	}
 
