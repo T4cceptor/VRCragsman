@@ -30,6 +30,9 @@ public:
 	void resetRope();
 	void startGame();
 
+	void jumpToNextPlattform();
+	void jumpToPreviousPlattform();
+
 private:
 	GameModel * model;
 	PhysicsController * pCtrl;
@@ -49,6 +52,7 @@ private:
 
 	int calcNewTick();
 	void changeCurrentState(int newState);
+	void jumpToPltForm(int i);
 
 	void moveTowardsPlattform();
 
