@@ -134,7 +134,7 @@ void GameController::callGameLoop(){
 								//newDirection.normalize();
 								if((tempPosition - lastObjPosition).length() > 0.1){
 								// (* it).setDirection(newDirection * speed);
-									(* it).setDirection(lastObj.getDirection());
+								//(* it).setDirection(lastObj.getDirection());
 									
 									
 								// (* it).addTranslation((* it).getDirection());
