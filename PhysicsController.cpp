@@ -114,8 +114,8 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 			if(newDirection.length() < minDirectionLengthValue){
 				newDirection = Vec3f(0,0,0);
 			} else {
-				obj.setLookAt(newDirection);
-			}
+				// obj.setLookAt(newDirection);
+			} 
 
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
 			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());

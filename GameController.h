@@ -33,6 +33,8 @@ public:
 	void jumpToNextPlattform();
 	void jumpToPreviousPlattform();
 
+	void setRopeOrigin(Vec3f newOrigin);
+
 private:
 	GameModel * model;
 	PhysicsController * pCtrl;
@@ -60,5 +62,15 @@ private:
 	int currentTickCount;
 
 	int countBounce;
+
+	Vec3f ropeOrigin;
+	Vec3f initialDirection;
+
+	Vec3f getBezierPoint(Vec3f a, Vec3f b, Vec3f c, Vec3f d, float t);
+
+	void calculateRopeDirection();
+	Vec3f calculateNewRopeDirection();
+
+	void calculateRopeLookAt();
 };
 
