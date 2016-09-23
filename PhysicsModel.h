@@ -1,6 +1,6 @@
 #pragma once
 #include "VRGPhysicsObject.h"
-#include <list>;
+#include <list>
 
 class PhysicsModel
 {

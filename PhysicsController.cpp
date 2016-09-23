@@ -71,18 +71,13 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	Vec3f direction = obj1.getDirection();
 	float directionLength = direction.length() * speed;
 	direction.normalize();
-	// Line ray = Line(obj1.getPosition() + direction, direction);
 	Line ray = Line(obj1.getPosition(), direction);
-
-	// Line ray = Line(obj1.getPosition() + direction * hook::movementOffsetScale, direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	// std::cout << "directionLength: " << directionLength << std::endl;
 	iAct->setLine(ray, directionLength); 
 	NodeRefPtr someNode = obj2.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
     {
-		// std::cout << "hook hit cave" << std::endl;
 		reflectionVector = calcReflectionVector(obj1.getDirection(), iAct->getHitNormal());
 		obj1.setDirection(reflectionVector);
 		Vec3f hitPoint = iAct->getHitPoint().subZero();
@@ -116,7 +111,6 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 			} else {
 				// obj.setLookAt(newDirection);
 			} 
-
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
 			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());
 		}

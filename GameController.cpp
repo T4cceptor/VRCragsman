@@ -32,16 +32,9 @@ void GameController::moveHook(Vec3f direction, float speed){
 	
 	initialDirection = direction * hook::movementVectorScale * general::scale * speed;
 	model->moveHook(
-		mgr->getTranslation() + direction * hook::movementOffsetScale * general::scale, 
+		ropeOrigin, 
 		initialDirection
 		);
-	//int c = 0;
-	//for (std::list<VRGPhysicsObject>::iterator it=model->getRopeTail().begin(); it != model->getRopeTail().end(); ++it){
-	//	(* it).setDirection(direction * hook::movementVectorScale * general::scale * speed);
-	//	(* it).setPosition(mgr->getTranslation());
-	//	c++;
-	//}
-	std::cout << "moving hook with speed: " << speed << std::endl;
 }
 
 void GameController::resetRope() {
@@ -93,7 +86,6 @@ Vec3f GameController::getBezierPoint(Vec3f origin, Vec3f p1, Vec3f p2, Vec3f tar
 	float uu = u*u;
 	float uuu = uu * u;
 	float ttt = tt * t;
-
 	Vec3f bp = uuu * origin;
 	bp += 3 * uu * t * p1;
 	bp += 3 * u * tt * p2;
@@ -107,8 +99,10 @@ Vec3f GameController::calculateNewRopeDirection(){
 	hookMgrVec.normalize();
 	Vec3f tempVec = initialDirection;
 	tempVec.normalize();
-	Vec3f newDirection = Vec3f(hookMgrVec[0], initialDirection[1] * 2 / 3, hookMgrVec[2]) + initialDirection / 10;
+	Vec3f intialPortion = initialDirection / 10;
+	Vec3f newDirection = Vec3f(hookMgrVec[0], 0, hookMgrVec[2]) + rope::gravityVector + intialPortion;
 	newDirection.normalize();
+	//newDirection = Vec3f(newDirection[0], newDirection[1] < 0 ? 0 : newDirection[1], newDirection[2]);
 	return newDirection * length;
 }
 
@@ -129,8 +123,18 @@ void GameController::calculateRopeDirection(){
 			Vec3f bezierDirection = bezierPoint0 - bezierPoint1;
 			float scale = bezierDirection.length() / 2;
 			Vec3f newScale = Vec3f(rope::scaleVector[0] * general::scale, rope::scaleVector[1] * general::scale, scale);
+			
+			
+			(* it).setDirection(bezierDirection / 2);
 			Vec3f newPosition = bezierPoint1 + bezierDirection / 2;
 			(* it).setPosition(newPosition);
+			// TODO: Test auf Kollision mit Cave -> zu performance intensiv
+			//bool didHit = pCtrl->collision((* it), model->getCave());
+			//if(!didHit){}
+
+			// TODO: LÃ¤nge des Seils berechnen
+
+			
 			(* it).getTransformation()->setScale(newScale);
 			MatrixLookAt((* it).getPosition(), lastObjPosition, Vec3f(0,1,0), (* it).getTransformation()->editRotation());
 
@@ -264,13 +268,13 @@ void GameController::callGameLoop(){
 			if(direction.length() < physics::minDirectionLengthValue * general::scale && inLine >= ropePieces.size()){
 				changeCurrentState(3);
 			}
-			// TODO: changeState(3) Bedingung ändern, Seil muss auch entsprechend animiert werden
+			// TODO: changeState(3) Bedingung ï¿½ndern, Seil muss auch entsprechend animiert werden
 
 		} else if (gameState == 3){ // TODO
 			moveTowardsPlattform();
 		} 
 
-		// TODO: diese beiden GameStates evtl. rauslassen -> lieber Knopf um Haken + Seil zurück zu setzen
+		// TODO: diese beiden GameStates evtl. rauslassen -> lieber Knopf um Haken + Seil zurï¿½ck zu setzen
 		else if (gameState == 4){ // TODO
 			Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
 			distanceVector.normalize();
@@ -286,7 +290,7 @@ void GameController::callGameLoop(){
 			}
 		} else if (gameState == 5){
 
-			// TODO: Hook kommt zum Spieler zurück
+			// TODO: Hook kommt zum Spieler zurï¿½ck
 			// Problem: Plattform ist im Weg ...
 			// -> korrekte Bewegung nachahmen
 
@@ -307,23 +311,38 @@ void GameController::callGameLoop(){
 }
 
 void GameController::moveTowardsPlattform(){
+	if(gameState != 3){
+		return;
+	}
 	Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 	Vec3f direction = pltformPosition - mgr->getTranslation();
-	if(direction.length() > physics::minDirectionLengthValue * general::scale){
-		mgr->setTranslation(mgr->getTranslation() + direction * 0.02);
+	float dLength = direction.length();
+	float dScale = 30;
+	dScale = (dScale > dLength ? dLength : dScale);
+	direction.normalize();
+	// if(direction.length() > physics::minDirectionLengthValue * general::scale){
+	if(mgr->getTranslation() != pltformPosition){
+		mgr->setTranslation(mgr->getTranslation() + direction * dScale);
 	} else {
-		mgr->setTranslation(pltformPosition);
+		ropeOrigin = pltPositions::positions[currentPltForm];
 		// resetHook();
+
+		mgr->setTranslation(pltformPosition);
 		changeCurrentState(1);
 	}
 }
 
 int GameController::calcNewTick(){
-	clock_t now = clock();
-	clock_t delta = now - startTime;
-	// timeDelta = static_cast<float>(delta);
-	// int seconds_elapsed = static_cast<int>(delta) / CLOCKS_PER_SEC;
-	int newTick = long(static_cast<long>(delta) / ( CLOCKS_PER_SEC / general::ticksPerSecond)) % general::ticksPerSecond;
+	std::chrono::steady_clock::time_point timeNow = std::chrono::steady_clock::now();
+	long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - linuxPrevTime).count();
+	int newTick = elapsed / (1000 / general::ticksPerSecond);
+	if(newTick == 0){
+		newTick = currentTick;
+	}
+	else{
+		linuxPrevTime = timeNow;
+		newTick = (currentTick + 1) % general::ticksPerSecond;
+	}
 	return newTick;
 }
 
@@ -383,6 +402,9 @@ void GameController::init(OSGCSM::CAVESceneManager* newMgr){
 	startTime = clock();
 	prepToStop = false;
 	currentPltForm = 0;
+	elapsedTime = 0;
 	hookFlying = false;
 	initialDirection = Vec3f(0,0,0);
+	ropeOrigin = pltPositions::positions[currentPltForm] * general::scale;
+	linuxPrevTime = std::chrono::steady_clock::now();
 }

@@ -1,9 +1,11 @@
-#pragma once
-#include <GameModel.h>
-#include <PhysicsController.h>
+// #pragma once
 #include <time.h>
-
+#include <chrono>
 #include <OSGCSM/OSGCAVESceneManager.h>
+#include "GameModel.h"
+
+//using Clock = std::chrono::high_resolution_clock;
+//using TimePoint = std::chrono::time_point<Clock>;
 
 class GameController
 {
@@ -51,7 +53,9 @@ private:
 	int currentPltForm;
 
 	clock_t startTime;
-
+	std::chrono::steady_clock::time_point linuxPrevTime;
+	long elapsedTime;
+	
 	int calcNewTick();
 	void changeCurrentState(int newState);
 	void jumpToPltForm(int i);

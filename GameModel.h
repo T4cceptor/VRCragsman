@@ -1,4 +1,4 @@
-#pragma once
+//#pragma once
 #include "NodeFactory.h"
 #include "PlattformObject.h"
 #include "PhysicsController.h"

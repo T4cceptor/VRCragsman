@@ -8,7 +8,7 @@ GameModel::GameModel(void)
 	std::cout << "GameModel contructor called" << std::endl;
 }
 
-/* TODO Parameter für Start übergeben - ?
+/* TODO Parameter fï¿½r Start ï¿½bergeben - ?
 GameModel::GameModel(void)
 {
 
@@ -94,7 +94,7 @@ VRGPhysicsObject GameModel::createNewHook(Pnt3f pos, Vec3f direction){
 	newHook.setDirection(direction.getValues()[0], direction.getValues()[1], direction.getValues()[2]);
 
 	// Der Haken wird anhand der aktuellen Blickrichtung ausgerichtet
-	// TODO für Cave -> MagicWand Vector
+	// TODO fï¿½r Cave -> MagicWand Vector
 	MatrixLookAt(pos, pos + direction, Vec3f(0,0,1), t->editRotation());
 
 	//lightedScene.addChild(newHook);

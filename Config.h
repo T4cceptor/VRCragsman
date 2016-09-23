@@ -70,17 +70,17 @@ namespace hook{
 namespace rope{
 	const Vec3f translationVector = Vec3f(0,0,0);
 	const Vec3f scaleVector = Vec3f(1,1,0.5) * 8;
-	const int pieces = 100;
+	const Vec3f gravityVector = Vec3f(0,-2,0); // TODO: konfiguration
+	const int pieces = 80;
 }
 
 namespace physics{
-	
 	// Problem: Werte m�ssen / sollten mit allgemeinem Skalierungsfaktor verrechnet werden
 	const float speed = 0.004; // TODO: Geschwindigkeit richtig einstellen
 	const int heightDimension = 1; // 0 = x-axis, 1 = y-axis, 2 = z-axis
 	const double floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
 	const float speedloss = 0.001; // TODO: Geschwindigkeit verlust richtig einstellen
-	const float gravity = 2; // TODO: Schwerkraft simulieren
+	const float gravity = 10; // TODO: Schwerkraft simulieren
 	const float minDirectionLengthValue = 2; // TODO, ist nicht der richtige Wert !
 }
 
