@@ -70,8 +70,9 @@ namespace hook{
 namespace rope{
 	const Vec3f translationVector = Vec3f(0,0,0);
 	const Vec3f scaleVector = Vec3f(1,1,0.5) * 8;
-	const Vec3f gravityVector = Vec3f(0,-2,0); // TODO: konfiguration
+	const Vec3f gravityVector = Vec3f(0,-0.2,0); // TODO: konfiguration
 	const int pieces = 80;
+	const long maxRopeLength = 30000; // ohne scale
 }
 
 namespace physics{

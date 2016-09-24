@@ -66,6 +66,7 @@ private:
 	int currentTickCount;
 
 	int countBounce;
+	float ropeLength;
 
 	Vec3f ropeOrigin;
 	Vec3f initialDirection;
