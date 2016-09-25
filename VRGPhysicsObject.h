@@ -15,6 +15,7 @@ public:
 	void setSpeed(float newSpeed);
 	Vec3f getDirection();
 	Vec3f getLookAt();
+	Vec3f getOffsetPosition();
 
 	float getSpeed();
 

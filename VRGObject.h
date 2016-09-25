@@ -38,6 +38,7 @@ private:
 	NodeRecPtr root;
 	NodeRecPtr geoNode;
 	ComponentTransformRecPtr objectTransformation;
+
 	/* TODO - ?
 		ObjectNode -> ObjectCore
 		TransformationNode

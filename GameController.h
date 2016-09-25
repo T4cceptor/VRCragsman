@@ -72,6 +72,7 @@ private:
 
 	Vec3f ropeOrigin;
 	Vec3f initialDirection;
+	int initialDirectionScale;
 
 	Vec3f getBezierPoint(Vec3f a, Vec3f b, Vec3f c, Vec3f d, float t);
 
@@ -86,5 +87,7 @@ private:
 
 	int ropeHitCave;
 	float shortestDistanceToCave;
+
+	
 };
 

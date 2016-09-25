@@ -7,8 +7,8 @@ namespace config{
 }
 
 namespace path{
-	const std::string caveModel = "../models/BasicCaveOnly20160815.obj";
-	const std::string hookModel = "../models/hookwithknot.obj";
+	const std::string caveModel = "../models/Cave1.obj";
+	const std::string hookModel = "../models/hookwithknot3.obj";
 	const std::string ropeModel = "../models/ropeonly.obj";
 	const std::string anchorModel = "../models/Anker.obj";
 }
@@ -53,7 +53,7 @@ namespace general {
 }
 
 namespace cave{
-	const Vec3f translationVector = Vec3f(370,0,337); // Anf�nglicher Translations Vektor
+	const Vec3f translationVector = Vec3f(-370,0,-330); // Anf�nglicher Translations Vektor
 	const Vec3f scaleVector = Vec3f(10,10,10); // Skalierung des 3D Models
 	const float velocityReduction = 0.2; // gibt Prozentwert an, auf den die Geschwindigkeit eines auftreffenden Objekts veringert wird
 }
@@ -61,9 +61,7 @@ namespace cave{
 namespace anchor{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
 	const Vec3f scaleVector = Vec3f(20,20,20); // Skalierung des 3D Models
-
 }
-
 
 namespace hook{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
@@ -73,6 +71,8 @@ namespace hook{
 	const float movementOffsetScale = 15; // Offset Skalierung wenn Hook geworfen wird
 	const float movementVectorScale = -25; // 
 	const float maxDistanceValue = 2000;
+
+	const float lookAtOffset = 200;
 }
 
 namespace rope{

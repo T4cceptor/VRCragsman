@@ -1,5 +1,5 @@
 #include "VRGPhysicsObject.h"
-
+#include "Config.h"
 
 VRGPhysicsObject::VRGPhysicsObject(void){
 	direction = new Vec3f(0,0,0);
@@ -21,6 +21,12 @@ Vec3f VRGPhysicsObject::getLookAt(){
 
 float VRGPhysicsObject::getSpeed(){
 	return speed;
+}
+
+Vec3f VRGPhysicsObject::getOffsetPosition(){
+	Vec3f offset = *lookAt;
+	offset.normalize();
+	return getPosition() - offset * hook::lookAtOffset;
 }
 
 void VRGPhysicsObject::setLookAt(Vec3f newDirection){
