@@ -85,5 +85,6 @@ private:
 	Vec3f ctrlPnt3;
 
 	int ropeHitCave;
+	float shortestDistanceToCave;
 };
 
