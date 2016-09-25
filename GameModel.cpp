@@ -41,6 +41,11 @@ VRGPhysicsObject GameModel::getHook(){
 VRGPhysicsObject GameModel::getRopeStart(){
 	return ropeStart;
 }
+
+VRGPhysicsObject GameModel::getAnchor(){
+	return anchor;
+}
+
 std::list<VRGPhysicsObject> GameModel::getRopeTail(){
 	return ropePieces;
 }
@@ -152,7 +157,9 @@ void GameModel::createScenegraph(){
 	for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
 		lightedScene.addChild((* it).getRootNode());
 	}
-	
+
+	anchor = nf.createAnchor();
+	lightedScene.addChild(anchor);
 
 	// TODO init plattforms
 	

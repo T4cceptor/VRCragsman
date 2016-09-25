@@ -24,6 +24,7 @@ public:
 	int didHitPLattform(VRGPhysicsObject obj);
 
 	Vec4f overthrow(Line line, VRGPhysicsObject obj, float length);
+	bool pointInsideObj(Vec3f point, VRGPhysicsObject obj);
 
 	Vec3f getReflectionVector();
 	Vec3f calcReflectionVector(Vec3f direction, Vec3f normal);

@@ -24,6 +24,7 @@ public:
 	VRGPhysicsObject getPlayer();
 	VRGPhysicsObject getHook();
 	VRGPhysicsObject getRopeStart();
+	VRGPhysicsObject getAnchor();
 	std::list<VRGPhysicsObject> getRopeTail();
 	std::list<PlattformObject> getPlattforms();
 	std::list<VRGPhysicsObject> getIcicles();
@@ -53,6 +54,7 @@ private:
 	VRGPhysicsObject cave;
 	VRGPhysicsObject player;
 	VRGPhysicsObject hook;
+	VRGPhysicsObject anchor;
 
 	NodeRecPtr lightTopPtr;
 	std::list<NodeRecPtr> staticCaveLights;

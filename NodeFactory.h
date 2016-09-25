@@ -55,6 +55,7 @@ public:
 
 	VRGPhysicsObject createHook();
 	VRGPhysicsObject createRope();
+	VRGPhysicsObject createAnchor();
 
 	NodeTransitPtr createNewLight(Pnt3f position, NodeRecPtr root);
 

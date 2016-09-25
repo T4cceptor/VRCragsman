@@ -10,6 +10,7 @@ namespace path{
 	const std::string caveModel = "../models/BasicCaveOnly20160815.obj";
 	const std::string hookModel = "../models/hookwithknot.obj";
 	const std::string ropeModel = "../models/ropeonly.obj";
+	const std::string anchorModel = "../models/Anker.obj";
 }
 
 namespace configLight{
@@ -57,6 +58,13 @@ namespace cave{
 	const float velocityReduction = 0.2; // gibt Prozentwert an, auf den die Geschwindigkeit eines auftreffenden Objekts veringert wird
 }
 
+namespace anchor{
+	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
+	const Vec3f scaleVector = Vec3f(20,20,20); // Skalierung des 3D Models
+
+}
+
+
 namespace hook{
 	const Vec3f translationVector = Vec3f(0,0,0); // Anf�nglicher Translations Vektor
 	const float scale = 8;
@@ -90,7 +98,7 @@ namespace physics{
 namespace pltPositions{
 	const int size = 12;
 	const Vec3f positions[12] = { 
-		Vec3f(0,-67,0),  // 0, -134, 0
+		Vec3f(0,-100,0),  // 0, -134, 0
 		Vec3f(-1204,-411,-563),
 		Vec3f(-646, -579, -2355),
 		Vec3f(-2885, -460, -2480),

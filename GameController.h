@@ -30,6 +30,8 @@ public:
 
 	void resetHook();
 	void resetRope();
+	void resetAnchor();
+	void resetGameState(int i);
 	void startGame();
 
 	void jumpToNextPlattform();
@@ -81,5 +83,7 @@ private:
 	Vec3f ctrlPnt1;
 	Vec3f ctrlPnt2;
 	Vec3f ctrlPnt3;
+
+	int ropeHitCave;
 };
 

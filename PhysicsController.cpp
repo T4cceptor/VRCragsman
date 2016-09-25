@@ -87,17 +87,52 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	return false;
 }
 
+bool PhysicsController::pointInsideObj(Vec3f point, VRGPhysicsObject obj){
+	// Line ray = Line(obj1.getPosition(), direction);
+	NodeRefPtr someNode = obj.getRootNode();
+	Vec3f yAxis = Vec3f(0,1,0);
+	Vec3f xAxis = Vec3f(1,0,0);
+	Line l1 = Line(point, yAxis);
+	Line l2 = Line(point, -yAxis);
+	Line l3 = Line(point, xAxis);
+	Line l4 = Line(point, -xAxis);
+
+	IntersectActionRefPtr iAct1 = (IntersectActionRefPtr)IntersectAction::create();
+	IntersectActionRefPtr iAct2 = (IntersectActionRefPtr)IntersectAction::create();
+	IntersectActionRefPtr iAct3 = (IntersectActionRefPtr)IntersectAction::create();
+	IntersectActionRefPtr iAct4 = (IntersectActionRefPtr)IntersectAction::create();
+
+	iAct1->setLine(l1);
+	iAct2->setLine(l2);
+	iAct3->setLine(l3);
+	iAct4->setLine(l4);
+
+	iAct1->apply((Node * const)someNode);
+	if(!iAct1->didHit())
+		return false;
+	iAct2->apply((Node * const)someNode);
+	if(!iAct2->didHit())
+		return false;
+	iAct3->apply((Node * const)someNode);
+	if(!iAct3->didHit())
+		return false;
+	iAct4->apply((Node * const)someNode);
+	if(!iAct4->didHit())
+		return false;
+	return true;
+}
+
 Vec4f PhysicsController::overthrow(Line line, VRGPhysicsObject obj, float length){
-	
 	Vec4f result = Vec4f(0,0,0,-1);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
-	iAct->setLine(line, length); 
-	
+	if(length == -1)
+		iAct->setLine(line); 
+	else
+		iAct->setLine(line, length); 
 	NodeRefPtr someNode = obj.getRootNode();
 	iAct->apply((Node * const)someNode);
     if (iAct->didHit())
 	{
-		//std::cout << "line length: " << line.getDirection().length() << " ,line position: " << line.getPosition() << "\n";
 		Vec3f hit = iAct->getHitPoint().subZero();
 		result = Vec4f(hit[0],hit[1],hit[2],1);
 	}

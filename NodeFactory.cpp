@@ -45,6 +45,21 @@ PlattformObject NodeFactory::createPlattform(std::string filePath){
 	return returnObj;
 }
 
+VRGPhysicsObject NodeFactory::createAnchor(){
+	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
+	NodeRecPtr anchor = createNodeFromFile(path::anchorModel);
+	returnObj.setGeometryNode(anchor);
+	ComponentTransformRecPtr compTransform = ComponentTransform::create();
+	returnObj.setTransformation(compTransform);
+	returnObj.getTransformation()->setScale(anchor::scaleVector);
+
+	NodeRecPtr transNode = makeNodeFor(compTransform);
+	transNode->addChild(anchor);
+	returnObj.setRootNode(transNode);
+	return returnObj;
+
+}
+
 VRGPhysicsObject NodeFactory::createRopePiece(){
 	VRGPhysicsObject returnObj = * new VRGPhysicsObject();
 	NodeRecPtr ropePiece = OSG::cloneTree(ropeBlueprint);
