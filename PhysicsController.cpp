@@ -87,6 +87,23 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
 	return false;
 }
 
+Vec4f PhysicsController::overthrow(Line line, VRGPhysicsObject obj, float length){
+	
+	Vec4f result = Vec4f(0,0,0,-1);
+	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
+	iAct->setLine(line, length); 
+	
+	NodeRefPtr someNode = obj.getRootNode();
+	iAct->apply((Node * const)someNode);
+    if (iAct->didHit())
+	{
+		//std::cout << "line length: " << line.getDirection().length() << " ,line position: " << line.getPosition() << "\n";
+		Vec3f hit = iAct->getHitPoint().subZero();
+		result = Vec4f(hit[0],hit[1],hit[2],1);
+	}
+	return result;
+}
+
 Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
 	Vec3f tempDirection = Vec3f(direction);
 	float speed = direction.length();

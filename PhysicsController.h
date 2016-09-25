@@ -23,8 +23,10 @@ public:
 
 	int didHitPLattform(VRGPhysicsObject obj);
 
-	Vec3f getReflectionVector();
+	Vec4f overthrow(Line line, VRGPhysicsObject obj, float length);
 
+	Vec3f getReflectionVector();
+	Vec3f calcReflectionVector(Vec3f direction, Vec3f normal);
 private:
 	PhysicsModel model;
 	int tick;
@@ -41,6 +43,6 @@ private:
 	Vec3f upVector;
 
 	Vec3f reflectionVector;
-	Vec3f calcReflectionVector(Vec3f direction, Vec3f normal);
+	
 };
 

@@ -77,5 +77,9 @@ private:
 	Vec3f calculateNewRopeDirection();
 
 	void calculateRopeLookAt();
+
+	Vec3f ctrlPnt1;
+	Vec3f ctrlPnt2;
+	Vec3f ctrlPnt3;
 };
 
