@@ -123,23 +123,29 @@ Vec3f GameController::getBezierPoint(Vec3f origin, Vec3f p1, Vec3f p2, Vec3f tar
 }
 
 Vec3f GameController::calculateNewRopeDirection(){
-	Vec3f hookMgrVec = model->getHook().getPosition() - mgr->getTranslation();
-	float length = initialDirection.length();
-	float min = 100;
-	float max = 1000;
-	length = length > min ? length / 2 : min; // min Wert einstellen - 10
-	length = length * 2 < max ? length * 2 : max; // max Wert einstellen - 100
+	Vec3f from = ropeOrigin;
+	Vec3f at = ctrlPnt1.length() > 0 ? ctrlPnt1 : model->getHook().getPosition();
+	Vec3f direction = at - from;
 
-	hookMgrVec.normalize();
+	float length = initialDirection.length();
+	float min = 1000;
+	float max = 1000;
+	//length = length > min ? length / 2 : min; // min Wert einstellen - 10
+	// length = length * 2 < max ? length * 2 : max; // max Wert einstellen - 100
+	length = length > direction.length() ? direction.length() : length;
+
+	direction.normalize();
 	Vec3f tempVec = initialDirection;
 	tempVec.normalize();
 	Vec3f intialPortion = tempVec * initialDirectionScale;
 	// Vec3f newDirection = Vec3f(hookMgrVec[0], 0, hookMgrVec[2]) + (initialDirection[1] < 0 ? Vec3f(0,0,0) : rope::gravityVector) + intialPortion;
-	Vec3f newDirection = Vec3f(hookMgrVec[0], 0, hookMgrVec[2]) + rope::gravityVector + intialPortion;
+	Vec3f newDirection = Vec3f(direction[0], 0, direction[2]) + rope::gravityVector + intialPortion;
 	newDirection.normalize();
+
+	// TODO
 	newDirection = Vec3f(newDirection[0], newDirection[1] < ropeOrigin[1] ? ropeOrigin[1] : newDirection[1], newDirection[2]);
 	//return newDirection * (length > 100 ? length - 1 : 100);
-	return newDirection * length;
+	return newDirection ;
 }
 
 float distanceToLine(Vec3f lineStart, Vec3f lineEnd, Vec3f point) {
@@ -150,17 +156,26 @@ float distanceToLine(Vec3f lineStart, Vec3f lineEnd, Vec3f point) {
 	return ((x0 - x2).cross(x0 - x1)).length() / ((x0 - x1).length());
 } 
 
-bool pointIsInbetween(Vec3f s, Vec3f e, Vec3f p){
-	for(int i = 0; i < 3; i++){
-		if(e[i] >= s[i]){
-			if((p[i] < s[i] || p[i] > e[i]))
-				return false;
-		} else if (e[0] < s[0]){
-			if((p[i] > s[i] || p[i] < e[i]))
-				return false;
+int pointRelationToLine(Vec3f s, Vec3f e, Vec3f p){
+	// p liegt auf y-Achse zwischen s und e UND (entweder auf x-Achse zwischen s und e ODER auf z-Achse zwischen s und e)
+	if((s[1] >= p[1] && e[1] <= p[1]) && 
+		((s[0] >= p[0] && e[0] <= p[0]) || (s[0] < p[0] && e[0] > p[0])) ||
+		((s[2] >= p[2] && e[2] <= p[2]) || (s[2] < p[2] && e[2] > p[2]))
+		){
+		Vec3f v1 = e - s;
+		v1.normalize();
+		Vec3f v2 = e - p;
+		v2.normalize();
+		// falls v2.y > v1.y => p liegt über der Strecke s->e, falls 0 => p liegt auf s->e, andernfalls darunter
+		if(v2[1] > v1[1]){
+			return 1;
+		} else if(v2[1] < v1[1]){
+			return -1;
 		}
+		else
+			return 0;
 	}
-	return true;
+	return 0;
 }
 
 void GameController::calculateRopeDirection(){
@@ -200,16 +215,24 @@ void GameController::calculateRopeDirection(){
 			}
 			
 			if(ctrlPnt1.length() != 0 && ropeHitCave == -1){
-				// TODO
 				Vec3f lineStart = currentPosition - currentDirection * 2;
 				Vec3f lineEnd = currentPosition + currentDirection * 2;
-				if(pointIsInbetween(lineStart, lineEnd, ctrlPnt1)){
-					float distanceToCtrlPnt = distanceToLine(lineStart, lineEnd, ctrlPnt1);
-					float testDistance = abs(lineStart[1] - lineEnd[1]) / 2;
-					// std::cout << "distanceToCtrlPnt: " << distanceToCtrlPnt << " ,test Distance: " << testDistance << "\n";
-					if(distanceToCtrlPnt < shortestDistance){ 
-						shortestDistance = distanceToCtrlPnt;
-					}
+				if(pointRelationToLine(lineStart, lineEnd, ctrlPnt1) == 1){
+					// std::cout << "count: " << count << "\n";
+					Vec3f distanceVector = lineEnd - lineStart;
+						Line l = Line(currentPosition, distanceVector);
+						Vec4f overthrow = pCtrl->overthrow(l, model->getCave(), distanceVector.length());
+						if(overthrow[3] != -1){ // if overthrow[3] != -1 => overthrow[0-2] = hitPoint
+							ctrlPnt1 = Vec3f(overthrow[0], overthrow[1], overthrow[2]);
+							// std::cout << "hit point" << ctrlPnt1 << "\n";
+							Vec3f hookDirection = model->getHook().getDirection();
+							hookDirection.normalize();
+							ctrlPnt2 = ctrlPnt1 + hookDirection;
+							ctrlPnt3 = ctrlPnt1 - hookDirection;
+
+							ropeHitCave = ropeListSize / 4;
+							initialDirection.normalize();
+						}
 				}
 			}
 			
@@ -234,18 +257,9 @@ void GameController::calculateRopeDirection(){
 				if(hook.getDirection().length() > 0)
 					ropeLength += scale;
 			}
-			
-			// TODO: Länge des Seils berechnen
-			
 			lastObj = (* it);
 			lastObjPosition = bezierPoint1;
 		}
-	}
-	if(shortestDistance <= shortestDistanceToCave){
-		shortestDistanceToCave = shortestDistance;
-	} else {
-		ropeHitCave = ropeListSize / 4;
-		initialDirection.normalize();
 	}
 }
 
@@ -265,18 +279,18 @@ void GameController::calculateRopeLookAt(){
 void GameController::callGameLoop(){
 	int newTick = calcNewTick();
 	if(newTick != currentTick){
+		currentTick = newTick;
 		currentTickCount++;
+		VRGPhysicsObject ropeStart = model->getRopeStart();
 		VRGPhysicsObject hook = model->getHook();
 		Vec3f hookPosition = hook.getPosition();
-		currentTick = newTick;
-		VRGPhysicsObject ropeStart = model->getRopeStart();
+		Vec3f hookDirection = hook.getDirection();
+		float hookDirectionLength = hookDirection.length();
 		// MatrixLookAt(ropeOrigin, Vec3f(hookPosition[0], 0, hookPosition[2]), Vec3f(0,1,0), model->getAnchor().getTransformation()->editRotation());						
 		if(gameState == 1){ 
-			Vec3f hookDirection = hook.getDirection();
-			if(hookDirection.length() > 0){
-
+			if(hookDirectionLength > 0){
 				pCtrl->calculateNewTickForPhysicsObject(hook);
-				if(hook.getDirection().length() > 0){
+				if(hookDirectionLength > 0){
 					bool didHit = pCtrl->collision(hook, model->getCave());
 					if(didHit){
 						// TODO
@@ -297,12 +311,13 @@ void GameController::callGameLoop(){
 						}
 					}
 
-					if(gameState == 1 && !didHit){
+					if(gameState == 1 && hook.getDirection().length() > 0){ // && !didHit
+						if(!didHit){
 						// test if cave part was overthrown by the hook
-						Vec3f distanceVector = hook.getPosition() - ropeOrigin;
+						Vec3f distanceVector = hookPosition - ropeOrigin;
 						Line l = Line(ropeOrigin, distanceVector);
 						Vec4f overthrow = pCtrl->overthrow(l, model->getCave(), distanceVector.length());
-						if(overthrow[3] != -1 && ctrlPnt1.length() == 0){
+						if(overthrow[3] != -1 && ctrlPnt1.length() == 0){ // if overthrow[3] != -1 => overthrow[0-2] = hitPoint
 							hookDirection.normalize();
 							ctrlPnt1 = Vec3f(overthrow[0], overthrow[1], overthrow[2]);
 							std::cout << "hit point" << ctrlPnt1 << "\n";
@@ -311,10 +326,10 @@ void GameController::callGameLoop(){
 						}  else if(overthrow[3] == -1 && ctrlPnt1.length() != 0){
 							ctrlPnt1 = Vec3f(0,0,0);
 						}
-
-						calculateRopeDirection();
-						calculateRopeLookAt();
-					}	
+							calculateRopeDirection();
+							calculateRopeLookAt();
+						}
+					}
 				}
 			}
 			if(!isGrounded()){

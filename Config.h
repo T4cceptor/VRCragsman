@@ -7,7 +7,7 @@ namespace config{
 }
 
 namespace path{
-	const std::string caveModel = "../models/Cave1.obj";
+	const std::string caveModel = "../models/Cave2.obj";
 	const std::string hookModel = "../models/hookwithknot3.obj";
 	const std::string ropeModel = "../models/ropeonly.obj";
 	const std::string anchorModel = "../models/Anker.obj";
@@ -53,7 +53,7 @@ namespace general {
 }
 
 namespace cave{
-	const Vec3f translationVector = Vec3f(-370,0,-330); // Anf�nglicher Translations Vektor
+	const Vec3f translationVector = Vec3f(370,0,330); // Anf�nglicher Translations Vektor
 	const Vec3f scaleVector = Vec3f(10,10,10); // Skalierung des 3D Models
 	const float velocityReduction = 0.2; // gibt Prozentwert an, auf den die Geschwindigkeit eines auftreffenden Objekts veringert wird
 }
@@ -98,7 +98,7 @@ namespace physics{
 namespace pltPositions{
 	const int size = 12;
 	const Vec3f positions[12] = { 
-		Vec3f(0,-100,0),  // 0, -134, 0
+		Vec3f(0,-67,0),  // 0, -134, 0
 		Vec3f(-1204,-411,-563),
 		Vec3f(-646, -579, -2355),
 		Vec3f(-2885, -460, -2480),
@@ -125,7 +125,7 @@ namespace pltPositions{
 	};
 
 	const Vec3f ropeOrigins[12] = {
-		Vec3f(0,-100,0),  // 0, -134, 0
+		Vec3f(0,-67,0),  // 0, -134, 0
 		Vec3f(-1204,-411,-563),
 		Vec3f(-646, -579, -2355),
 		Vec3f(-2885, -460, -2480),
