@@ -7,7 +7,7 @@ namespace config{
 }
 
 namespace path{
-	const std::string caveModel = "../models/Cave2.obj";
+	const std::string caveModel = "../models/Cave3.obj";
 	const std::string hookModel = "../models/hookwithknot3.obj";
 	const std::string ropeModel = "../models/ropeonly.obj";
 	const std::string anchorModel = "../models/Anker.obj";
@@ -56,6 +56,7 @@ namespace cave{
 	const Vec3f translationVector = Vec3f(370,0,330); // Anf�nglicher Translations Vektor
 	const Vec3f scaleVector = Vec3f(10,10,10); // Skalierung des 3D Models
 	const float velocityReduction = 0.2; // gibt Prozentwert an, auf den die Geschwindigkeit eines auftreffenden Objekts veringert wird
+	const Vec3f gravity = Vec3f(0,-3, 0);
 }
 
 namespace anchor{
@@ -70,7 +71,7 @@ namespace hook{
 
 	const float movementOffsetScale = 15; // Offset Skalierung wenn Hook geworfen wird
 	const float movementVectorScale = -25; // 
-	const float maxDistanceValue = 2000;
+	const float maxDistanceValue = 2200;
 
 	const float lookAtOffset = 200;
 }
@@ -90,22 +91,24 @@ namespace physics{
 	const double floorValue = -100000.0; // TODO: tiefsten Punkt einstellen
 	const float speedloss = 0.001; // TODO: Geschwindigkeit verlust richtig einstellen
 	const float gravity = 10; // TODO: Schwerkraft simulieren
-	const float minDirectionLengthValue = 2; // TODO, ist nicht der richtige Wert !
+	const float minDirectionLengthValue = 10; // TODO, ist nicht der richtige Wert !
 }
+
 
 // TODO:
 // Idee: dynamische hit Distanz, je nach Plattform, als 4D Vektor
 namespace pltPositions{
 	const int size = 12;
+	// const Vec3f offset = Vec3f(0,100,0);
 	const Vec3f positions[12] = { 
-		Vec3f(0,-67,0),  // 0, -134, 0
-		Vec3f(-1204,-411,-563),
-		Vec3f(-646, -579, -2355),
-		Vec3f(-2885, -460, -2480),
-		Vec3f(-4464, -535, -3730),  
-		Vec3f(-4139, -823, -5308), 
-		Vec3f(-6509, -834, -4719), 
-		Vec3f(-7277, -1324, -7274), 
+		Vec3f(30,-80,30),  // 0, -134, 0
+		Vec3f(-1204,-385,-563),
+		Vec3f(-733, -625, -2500),
+		Vec3f(-2611, -690, -2525),
+		Vec3f(-4200, -525, -2383),  
+		Vec3f(-4566, -650, -4122), 
+		Vec3f(-4343, -805, -5500), 
+		Vec3f(-7277, -1290, -7274), // TODO 
 		Vec3f(-6935, -2056, -9852),
 		Vec3f(-9397, -627, -9005),
 		Vec3f(-9236, -1633, -11737),
@@ -125,14 +128,14 @@ namespace pltPositions{
 	};
 
 	const Vec3f ropeOrigins[12] = {
-		Vec3f(0,-67,0),  // 0, -134, 0
-		Vec3f(-1204,-411,-563),
-		Vec3f(-646, -579, -2355),
-		Vec3f(-2885, -460, -2480),
-		Vec3f(-4464, -535, -3730),  
-		Vec3f(-4139, -823, -5308), 
-		Vec3f(-6509, -834, -4719), 
-		Vec3f(-7277, -1324, -7274), 
+		Vec3f(30,-80,30),  // 0, -134, 0
+		Vec3f(-1204,-380,-563),
+		Vec3f(-733, -620, -2500),
+		Vec3f(-2611, -686, -2525),
+		Vec3f(-4200, -520, -2383),  
+		Vec3f(-4566, -643, -4122), 
+		Vec3f(-4343, -800, -5500), 
+		Vec3f(-7277, -1284, -7274), // TODO 
 		Vec3f(-6935, -2056, -9852),
 		Vec3f(-9397, -627, -9005),
 		Vec3f(-9236, -1633, -11737),

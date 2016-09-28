@@ -146,7 +146,7 @@ Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
 	normal.normalize();
 	Vec3f r = 2 * (-direction.dot(normal)) * normal + direction;
 	r.normalize();
-	return r * speed * cave::velocityReduction;
+	return r * speed * cave::velocityReduction - cave::gravity;
 }
 
 void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
