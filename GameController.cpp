@@ -123,30 +123,29 @@ Vec3f GameController::getBezierPoint(Vec3f origin, Vec3f p1, Vec3f p2, Vec3f tar
 }
 
 Vec3f GameController::calculateNewRopeDirection(){
+	
+
 	Vec3f from = ropeOrigin;
 	Vec3f at = (ctrlPnt1.length() > 0 && ropeHitCave > 0) ? ctrlPnt1 : model->getHook().getPosition();
 	Vec3f direction = at - from;
+	if(gameState == 2){
+		return direction;
+	}
 
 	float length = initialDirection.length();
 	float min = 1000;
 	float max = 1000;
-	//length = length > min ? length / 2 : min; // min Wert einstellen - 10
-	// length = length > direction.length() ? direction.length() : length;
 	length = direction.length() / 8;
 	length = length < max ? length : max; // max Wert einstellen - 100
-	//length = length > direction.length() ? direction.length() : length;
 
 	direction.normalize();
 	Vec3f tempVec = initialDirection;
 	tempVec.normalize();
 	Vec3f intialPortion = tempVec * initialDirectionScale;
-	// Vec3f newDirection = Vec3f(hookMgrVec[0], 0, hookMgrVec[2]) + (initialDirection[1] < 0 ? Vec3f(0,0,0) : rope::gravityVector) + intialPortion;
 	Vec3f newDirection = Vec3f(direction[0], 0, direction[2]) + rope::gravityVector + intialPortion;
 	newDirection.normalize();
 
-	// TODO
 	newDirection = Vec3f(newDirection[0], newDirection[1] < ropeOrigin[1] ? ropeOrigin[1] : newDirection[1], newDirection[2]);
-	//return newDirection * (length > 100 ? length - 1 : 100);
 	return newDirection * length;
 }
 
@@ -341,33 +340,33 @@ void GameController::callGameLoop(){
 				mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
 			}
 		} else if (gameState == 2){
-			
 			Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
-			Vec3f direction = pltformPosition - hook.getOffsetPosition();
+			Vec3f hookPosition = hook.getPosition();
+			Vec3f direction = pltformPosition - hookPosition;
 			int countRopePieces = currentTickCount;
-			Vec3f hookPosition = hook.getOffsetPosition();
-			// Vec3f mgrPosition = ropeOrigin;
 			Vec3f mgrHook = hookPosition - ropeOrigin;
+
 			std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
 			VRGPhysicsObject lastObj = hook;
-			Vec3f lastObjPosition = hook.getPosition();
+			Vec3f lastObjPosition = hookPosition;
 			int count = 0;
 			int inLine = 0;
 			if(direction.length() > physics::minDirectionLengthValue * general::scale){
-				hook.setPosition(hook.getPosition() + (direction * 0.02));
+				Vec3f tempDirection = direction;
+				tempDirection.normalize();
+				hook.setPosition(hookPosition + tempDirection * 10);
 			} else {
 				hook.setPosition(pltformPosition);
 				hook.setLookAt(mgrHook);
-				MatrixLookAt(hook.getPosition(), hookPosition + mgrHook, Vec3f(0,1,0), hook.getTransformation()->editRotation());
+				MatrixLookAt(hookPosition, hookPosition + mgrHook, Vec3f(0,1,0), hook.getTransformation()->editRotation());
 			}
 
-			// initialDirectionScale += 100;
-			std::cout << "initialDirectionScale: " << initialDirectionScale << "\n"; 
-			calculateRopeDirection();
+			// calculateRopeLookAt();
 			if(direction.length() < physics::minDirectionLengthValue * general::scale){
+				calculateRopeDirection();
 				changeCurrentState(3);
 			}
-
+			calculateRopeDirection();
 			/*
 			for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
 				count++;
@@ -440,22 +439,25 @@ void GameController::moveTowardsPlattform(){
 	if(gameState != 3){
 		return;
 	}
-	Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale ; //+ pltPositions::offset;
+	Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale + pltPositions::offset; //+ pltPositions::offset;
 	Vec3f direction = pltformPosition - mgr->getTranslation();
 	float dLength = direction.length();
 	float dScale = 30;
 	dScale = (dScale > dLength ? dLength : dScale);
 	direction.normalize();
 	// if(direction.length() > physics::minDirectionLengthValue * general::scale){
+	float circleRotation = 2 * general::pi;
+	//float rotation = pltPositions::rotation[currentPltForm] < 0 ? 
+	//	circleRotation + pltPositions::rotation[currentPltForm] : pltPositions::rotation[currentPltForm];
 	if(mgr->getTranslation() != pltformPosition){
 		mgr->setTranslation(mgr->getTranslation() + direction * dScale);
 	} else {
+		// 2 * pi 
 		ropeOrigin = pltPositions::positions[currentPltForm];
-		// resetHook();
-
 		mgr->setTranslation(pltformPosition);
-		changeCurrentState(1);
+		// mgr->setYRotate(pltPositions::rotation[currentPltForm]);
 
+		changeCurrentState(1);
 		// resetGameState(1);
 	}
 }

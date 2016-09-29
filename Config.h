@@ -37,7 +37,7 @@ namespace configLight{
 }
 
 namespace general {
-	const double scale = 6.0; // muss entsprechend der Ausf�hrungsumgebung angepasst werden!
+	const double scale = 5.5; // muss entsprechend der Ausf�hrungsumgebung angepasst werden!
 	const double movementFactor = 10.0;
 
 	const Vec3f upVector = Vec3f(0,1,0); // je nach Koordinatensystem einstellen
@@ -50,6 +50,8 @@ namespace general {
 	const int ticksPerSecond = 50;
 
 	const int maxCount = 100;
+
+	const double pi = atan(1)*4;
 }
 
 namespace cave{
@@ -99,42 +101,44 @@ namespace physics{
 // Idee: dynamische hit Distanz, je nach Plattform, als 4D Vektor
 namespace pltPositions{
 	const int size = 12;
-	// const Vec3f offset = Vec3f(0,100,0);
+	
+	const Vec3f offset = Vec3f(0,100,0);
 	const Vec3f positions[12] = { 
 		Vec3f(30,-80,30),  // 0, -134, 0
-		Vec3f(-1204,-385,-563),
-		Vec3f(-733, -625, -2500),
-		Vec3f(-2611, -690, -2525),
-		Vec3f(-4200, -525, -2383),  
-		Vec3f(-4566, -650, -4122), 
-		Vec3f(-4343, -805, -5500), 
+		Vec3f(-1204,-415,-563),
+		Vec3f(-733, -640, -2500),
+		Vec3f(-2611, -702, -2525),
+		Vec3f(-4200, -516, -2383),  
+		Vec3f(-4566, -666, -4122), 
+		Vec3f(-4343, -810, -5500), 
 		Vec3f(-7277, -1290, -7274), // TODO 
 		Vec3f(-6935, -2056, -9852),
 		Vec3f(-9397, -627, -9005),
 		Vec3f(-9236, -1633, -11737),
 		Vec3f(-12619, -2718, -11006)
 	};
+	const double pi2 = 2 * atan(1)*4;
 	const float rotation[12] = {
 		1.0f,
-		0.5f,
-		1.4f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f
+		pi2 - 0.3f,
+		2.1f,
+		1.3f,
+		2.9f,
+		3.1f,
+		1.0f, // TODO
+		1.0f, // TODO
+		1.0f, // TODO
+		1.0f // TODO
 	};
 
 	const Vec3f ropeOrigins[12] = {
-		Vec3f(30,-80,30),  // 0, -134, 0
-		Vec3f(-1204,-380,-563),
-		Vec3f(-733, -620, -2500),
-		Vec3f(-2611, -686, -2525),
-		Vec3f(-4200, -520, -2383),  
-		Vec3f(-4566, -643, -4122), 
-		Vec3f(-4343, -800, -5500), 
+		Vec3f(0,-80, 0),  // 0, -134, 0
+		Vec3f(-1204,-417,-563),
+		Vec3f(-733, -638, -2500),
+		Vec3f(-2611, -700, -2525),
+		Vec3f(-4200, -533, -2383),  
+		Vec3f(-4566, -664, -4122), 
+		Vec3f(-4343, -810, -5500), 
 		Vec3f(-7277, -1284, -7274), // TODO 
 		Vec3f(-6935, -2056, -9852),
 		Vec3f(-9397, -627, -9005),
