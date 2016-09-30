@@ -277,6 +277,11 @@ void GameController::calculateRopeLookAt(){
 	hook.setLookAt(newLookAt);
 }
 
+void GameController::resetBezier(){
+	ctrlPnt1 = Vec3f(0,0,0);
+	ropeHitCave = -1;
+}
+
 void GameController::callGameLoop(){
 	int newTick = calcNewTick();
 	if(newTick != currentTick){
@@ -327,8 +332,7 @@ void GameController::callGameLoop(){
 							ctrlPnt3 = ctrlPnt1 - hookDirection;
 							std::cout << "hit point" << ctrlPnt1 << "\n";
 						}  else if(overthrow[3] == -1 && (ctrlPnt1.length() != 0 || ropeHitCave > 0)){
-							ctrlPnt1 = Vec3f(0,0,0);
-							ropeHitCave = -1;
+							resetBezier();
 						} 
 							calculateRopeDirection();
 							calculateRopeLookAt();
@@ -340,15 +344,14 @@ void GameController::callGameLoop(){
 				mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
 			}
 		} else if (gameState == 2){
+			resetBezier();
 			Vec3f pltformPosition = pltPositions::positions[currentPltForm] * general::scale;
 			Vec3f hookPosition = hook.getPosition();
 			Vec3f direction = pltformPosition - hookPosition;
-			int countRopePieces = currentTickCount;
 			Vec3f mgrHook = hookPosition - ropeOrigin;
 
 			std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
 			VRGPhysicsObject lastObj = hook;
-			Vec3f lastObjPosition = hookPosition;
 			int count = 0;
 			int inLine = 0;
 			if(direction.length() > physics::minDirectionLengthValue * general::scale){
@@ -361,40 +364,12 @@ void GameController::callGameLoop(){
 				MatrixLookAt(hookPosition, hookPosition + mgrHook, Vec3f(0,1,0), hook.getTransformation()->editRotation());
 			}
 
-			// calculateRopeLookAt();
 			if(direction.length() < physics::minDirectionLengthValue * general::scale){
 				calculateRopeDirection();
 				changeCurrentState(3);
 			}
+
 			calculateRopeDirection();
-			/*
-			for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
-				count++;
-				Vec3f targetPosition = mgrPosition + (mgrHook / ropePieces.size()) * (ropePieces.size() - count);
-				Vec3f currentPosition = (* it).getPosition();
-				Vec3f targetVector = targetPosition - currentPosition;
-				if(targetVector.length() > 0.05){
-					//targetVector.normalize();
-					Vec3f positionVector = lastObj.getPosition() - currentPosition;
-					Vec3f newScale = Vec3f(rope::scaleVector[0] * general::scale,rope::scaleVector[1] * general::scale,positionVector.length());
-					(* it).getTransformation()->setScale(newScale * 0.75);
-					(* it).setPosition(currentPosition + targetVector * 0.06);
-					MatrixLookAt((* it).getPosition(), lastObj.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
-				} else {
-					inLine++;
-					MatrixLookAt((* it).getPosition(), hook.getPosition(), Vec3f(0,1,0), (* it).getTransformation()->editRotation());
-				}
-				lastObj = (* it);
-				lastObjPosition = currentPosition;
-			}
-
-
-			if(direction.length() < physics::minDirectionLengthValue * general::scale && inLine >= ropePieces.size()){
-				changeCurrentState(3);
-			}
-			// TODO: changeState(3) Bedingung �ndern, Seil muss auch entsprechend animiert werden
-
-			*/
 		} else if (gameState == 3){ // TODO
 			moveTowardsPlattform();
 		} 

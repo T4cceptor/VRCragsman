@@ -88,6 +88,6 @@ private:
 	int ropeHitCave;
 	float shortestDistanceToCave;
 
-	
+	void resetBezier();
 };
 

@@ -91,7 +91,7 @@ VRGPhysicsObject NodeFactory::createCave(){
 	GeometryRecPtr geo = dynamic_cast<Geometry *>(cave->getCore());
 	createSharedIndex(geo);
 	calcVertexNormals(geo);
-    // calcVertexNormals(geo, osgDegree2Rad(30));
+    // calcVertexNormals(geo, osgDegree2Rad(-15));
 	// calcFaceNormals(geo);
 
 	ComponentTransformRecPtr compTransform = ComponentTransform::create();

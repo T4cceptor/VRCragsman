@@ -29,11 +29,59 @@ namespace configLight{
 	sunLight->setSpecular(Color4f(0.5,0.6,0.8,1));
 	*/
 
-
-	const Vec3f positions[1] = { 
-		Vec3f(540,50,540)
+	const int positionsSize = 5;
+	const Vec3f positions[positionsSize] = { 
+		Vec3f(-20000,-3000,-15000),
+		Vec3f( -30, 500, -40),
+		Vec3f(-1040,-2500,-540),
+		Vec3f(-1540,-2500,-740),
+		Vec3f(-2040,-2500,-940),
+		//Vec3f(-1640,-2500,-1140),
+		//Vec3f(-1840,-2500,-1340),
+		//Vec3f(-2040,-2500,-1540),
+		//Vec3f(-2240,-2500,-1740),
+		//Vec3f(-2440,-2500,-1940),
 	};
 
+	// l2->setAttenuation(3,0.001,0);
+	/*
+	Color4f globalDiffuse = Color4f(0.4,0.4,0.6,0.5);
+	Color4f globalAmbient = Color4f(0.1f,0.3f,0.3f,0.5);
+	Color4f globalSpecular = Color4f(0.3,0.3,0.3,0.5);
+	*/
+	const Vec3f attenuations[positionsSize] = {
+		Vec3f (2,0.00001,0),
+		Vec3f (1,0.00002,0),
+		//Vec3f (2,0.0002,0),
+		//Vec3f (3,0.0001,0),
+		//Vec3f (3,0.0001,0)
+		Vec3f (20,0.02,0),
+		Vec3f (30,0.01,0),
+		Vec3f (30,0.01,0)
+	};
+	const Vec4f diffuseColors[positionsSize] = {
+		Vec4f (0,0,0,0), 
+		Vec4f (0.6,0.6,0.8,1),
+		Vec4f (0.4,0.4,0.6,0.5),
+		Vec4f (0.4,0.4,0.6,0.5),
+		Vec4f (0.4,0.4,0.6,0.5)
+	};
+	const Vec4f ambientColors[positionsSize] = {
+		Vec4f (0,0,0,0), // R: 255, G: 255, B: 204
+		Vec4f (0.05f,0.15f,0.15f,1),
+		Vec4f (0.1f,0.3f,0.3f,0.5),
+		Vec4f (0.1f,0.3f,0.3f,0.5),
+		Vec4f (0.1f,0.3f,0.3f,0.5)
+	};
+	
+	
+	const Vec4f specularColors[positionsSize] = {
+		Vec4f (0,0,0,0), // R: 255, G: 153, B: 51
+		Vec4f (0.1,0.1,0.1,1),
+		Vec4f (0.3,0.3,0.3,0.5),
+		Vec4f (0.3,0.3,0.3,0.5),
+		Vec4f (0.3,0.3,0.3,0.5)
+	};
 }
 
 namespace general {

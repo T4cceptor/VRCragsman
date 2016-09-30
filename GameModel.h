@@ -48,6 +48,8 @@ private:
 	// TODO
 	int gameState;
 
+	void setupLights();
+
 	// Game Objects
 	NodeFactory nf;
 	VRGPhysicsObject root;

@@ -83,7 +83,6 @@ void GameModel::initGameModel(PhysicsController * pc){
 	physicCtrl = *pc;
 }
 
-
 extern void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation);
 
 template <typename T> int sgn(T val) {
@@ -95,28 +94,43 @@ VRGPhysicsObject GameModel::createNewHook(Pnt3f pos, Vec3f direction){
 	ComponentTransformRecPtr t = newHook.getTransformation();
 	t->setScale(hook::scaleVector * general::scale);
 	t->setTranslation(pos.subZero());
-
 	newHook.setDirection(direction.getValues()[0], direction.getValues()[1], direction.getValues()[2]);
-
-	// Der Haken wird anhand der aktuellen Blickrichtung ausgerichtet
-	// TODO f�r Cave -> MagicWand Vector
 	MatrixLookAt(pos, pos + direction, Vec3f(0,0,1), t->editRotation());
-
-	//lightedScene.addChild(newHook);
-	// physicCtrl.registerNewPhysicsObject(newHook, true);
 	return newHook;
 }
 
 void GameModel::moveHook(Pnt3f pos, Vec3f direction){
-	// Der Haken wird anhand der aktuellen Blickrichtung ausgerichtet
-	
 	hook.setPosition(pos[0],pos[1],pos[2]);
 	hook.setDirection(direction.getValues()[0], direction.getValues()[1], direction.getValues()[2]);
 	hook.setLookAt(direction);
-	// MatrixLookAt(pos, pos + direction, Vec3f(0,1,0), hook.getRotation());
 	std::cout << "position: " << pos << std::endl;
 	std::cout << "direction: " << direction << std::endl;
 	std::cout << "rotation: " << hook.getRotation() << std::endl;
+}
+
+void GameModel::setupLights(){	
+	int count = configLight::positionsSize;
+	NodeRecPtr lightNode = root.getRootNode();
+	for(int i = 0; i < count; i++){
+		NodeRecPtr newLightNode = (NodeRecPtr)nf.createNewLight(configLight::positions[i] * general::scale, lightNode);
+		PointLightRecPtr l2 =  dynamic_cast<PointLight*>(newLightNode->getCore());
+		Vec3f attenuation = configLight::attenuations[i];
+		Vec4f diffuseColor = configLight::diffuseColors[i];
+		Vec4f ambientColor = configLight::ambientColors[i];
+		Vec4f specularColor = configLight::specularColors[i];
+		if(attenuation.length() > 0)
+			l2->setAttenuation(attenuation[0], attenuation[1], attenuation[2]);
+		if(ambientColor.length() > 0)
+			l2->setAmbient(ambientColor[0], ambientColor[1], ambientColor[2], ambientColor[3]);
+		if(diffuseColor.length() > 0)
+			l2->setDiffuse(diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]);
+		if(specularColor.length() > 0)
+			l2->setSpecular(specularColor[0], specularColor[1], specularColor[2], specularColor[3]);
+
+		if(i == count - 1)
+			newLightNode->addChild(lightedScene.getRootNode());
+		lightNode = newLightNode;
+	}
 }
 
 void GameModel::createScenegraph(){
@@ -129,15 +143,8 @@ void GameModel::createScenegraph(){
 	staticCaveLights = * new std::list<NodeRecPtr>();
 	lightedScene = nf.createEmptyVRGObj();
 
-	// TODO setup light 
-	NodeRecPtr testLight = (NodeRecPtr)nf.createNewLight(configLight::positions[0], root.getRootNode());
-	staticCaveLights.push_front(testLight);
-
-	// Idee: 
-	// staticCaveLights = nf.createLightSetup();
-	for (std::list<NodeRecPtr>::iterator it=staticCaveLights.begin(); it != staticCaveLights.end(); ++it){
-		(* it)->addChild(lightedScene.getRootNode());
-	}
+	// light setup
+	setupLights();
 
 	cave = nf.createCave();
 	lightedScene.addChild(cave.getRootNode());
@@ -145,10 +152,10 @@ void GameModel::createScenegraph(){
 	hook = createNewHook(Pnt3f(0,0,0), Vec3f(0,-1,0));
 	lightedScene.addChild(hook);
 
-	// TODO init rope
+
 	// createDeepCopy !!
-	ropeStart = nf.createRopePiece();
-	lightedScene.addChild(ropeStart);
+	// ropeStart = nf.createRopePiece();
+	// lightedScene.addChild(ropeStart);
 
 	for(int i = 0; i < rope::pieces; i++){
 		ropePieces.push_back(nf.createRopePiece());
@@ -161,9 +168,9 @@ void GameModel::createScenegraph(){
 	anchor = nf.createAnchor();
 	lightedScene.addChild(anchor);
 
-	// TODO init plattforms
-	
-	// TODO init icicles
+
+	// TODO init icicles / rocks
+	// TODO init stuff
 	
 }
 
