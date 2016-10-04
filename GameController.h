@@ -49,48 +49,40 @@ private:
 	PhysicsController * pCtrl;
 	OSGCSM::CAVESceneManager *mgr;
 
-	bool hookFlying;
-
-	Vec3f tossVector;
-
 	int currentTick;
-	int readyToChangeState;
 	int gameState;
-	bool prepToStop;
 	int currentPltForm;
 
-	clock_t startTime;
-	std::chrono::steady_clock::time_point linuxPrevTime;
 	long elapsedTime;
+	std::chrono::steady_clock::time_point linuxPrevTime;
 	
-	int calcNewTick();
-	void changeCurrentState(int newState);
-	void jumpToPltForm(int i);
-
 	int count;
-	int currentTickCount;
-
-	int countBounce;
 	float ropeLength;
-
-	Vec3f ropeOrigin;
-	Vec3f initialDirection;
-	int initialDirectionScale;
-
-	Vec3f getBezierPoint(Vec3f a, Vec3f b, Vec3f c, Vec3f d, float t);
-
-	void calculateRopeDirection();
-	Vec3f calculateNewRopeDirection();
-
-	void calculateRopeLookAt();
 
 	Vec3f ctrlPnt1;
 	Vec3f ctrlPnt2;
 	Vec3f ctrlPnt3;
 
 	int ropeHitCave;
-	float shortestDistanceToCave;
 
+	float caveMovement;
+
+	Vec3f ropeOrigin;
+	Vec3f initialDirection;
+	int initialDirectionScale;
+
+	int calcNewTick();
+	void changeCurrentState(int newState);
+	void jumpToPltForm(int i);
+
+	void calculateHookLookAt();
+	void calculateRopePositions();
+	Vec3f calculateNewRopeDirection();
+	Vec3f getBezierPoint(Vec3f a, Vec3f b, Vec3f c, Vec3f d, float t);
 	void resetBezier();
+
+	void calculatePlatformTransition(int p);
+	void calculateRope();
+	void animateHookToNewOrigin();
 };
 

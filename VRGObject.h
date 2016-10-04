@@ -37,15 +37,6 @@ private:
 	int id;
 	NodeRecPtr root;
 	NodeRecPtr geoNode;
-	ComponentTransformRecPtr objectTransformation;
-
-	/* TODO - ?
-		ObjectNode -> ObjectCore
-		TransformationNode
-		TextureNode
-		MaterialNode
-	*/
-	// Vec3f position;
-	
+	ComponentTransformRecPtr objectTransformation;	
 };
 

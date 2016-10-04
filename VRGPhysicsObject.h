@@ -17,11 +17,8 @@ public:
 	Vec3f getLookAt();
 	Vec3f getOffsetPosition();
 
-	float getSpeed();
-
 private:
 	Vec3f * direction;
 	Vec3f * lookAt;
-	float speed;
 };
 

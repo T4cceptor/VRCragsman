@@ -7,7 +7,6 @@ extern float timeDelta;
 
 PhysicsController::PhysicsController(void)
 {
-	model = * new PhysicsModel();
 	std::cout << "PhysicsController contructor called" << std::endl;
 
 	// Werte in Config.h einstellen
@@ -18,32 +17,15 @@ PhysicsController::PhysicsController(void)
 	gravity = physics::gravity * general::scale;
 	minDirectionLengthValue = physics::minDirectionLengthValue * general::scale;
 	upVector = general::upVector;
-
-	tick = 0;
-	time = 0;
-	startTime = clock();
 }
 
 PhysicsController::~PhysicsController(void){}
-
-// deprecated - use "calculateNewTickForPhysicsObject" instead
-//void PhysicsController::registerNewPhysicsObject(VRGPhysicsObject obj, bool isMoveable){
-//	// TODO
-//	// VRGLogger::logMessage("Registered new physic object ");
-//	if(isMoveable){
-//		std::cout << "added new physics object" << std::endl;
-//		model.addMoveableObject(obj);
-//	}
-//}
 
 Vec3f PhysicsController::getReflectionVector(){
 	return reflectionVector;
 }
 
 void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation){
-		// TODO Performance upgrade!!!
-//		std::cout << "calculating new look at: " << at << std::endl;
-//		std::cout << "rotation: " << rotation << std::endl;
 		Vec3f view = at - from;
 		view.normalize();
 		Vec3f right = up % view;
@@ -87,41 +69,6 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGObject obj2){
 	return false;
 }
 
-bool PhysicsController::pointInsideObj(Vec3f point, VRGPhysicsObject obj){
-	// Line ray = Line(obj1.getPosition(), direction);
-	NodeRefPtr someNode = obj.getRootNode();
-	Vec3f yAxis = Vec3f(0,1,0);
-	Vec3f xAxis = Vec3f(1,0,0);
-	Line l1 = Line(point, yAxis);
-	Line l2 = Line(point, -yAxis);
-	Line l3 = Line(point, xAxis);
-	Line l4 = Line(point, -xAxis);
-
-	IntersectActionRefPtr iAct1 = (IntersectActionRefPtr)IntersectAction::create();
-	IntersectActionRefPtr iAct2 = (IntersectActionRefPtr)IntersectAction::create();
-	IntersectActionRefPtr iAct3 = (IntersectActionRefPtr)IntersectAction::create();
-	IntersectActionRefPtr iAct4 = (IntersectActionRefPtr)IntersectAction::create();
-
-	iAct1->setLine(l1);
-	iAct2->setLine(l2);
-	iAct3->setLine(l3);
-	iAct4->setLine(l4);
-
-	iAct1->apply((Node * const)someNode);
-	if(!iAct1->didHit())
-		return false;
-	iAct2->apply((Node * const)someNode);
-	if(!iAct2->didHit())
-		return false;
-	iAct3->apply((Node * const)someNode);
-	if(!iAct3->didHit())
-		return false;
-	iAct4->apply((Node * const)someNode);
-	if(!iAct4->didHit())
-		return false;
-	return true;
-}
-
 Vec4f PhysicsController::overthrow(Line line, VRGObject obj, float length){
 	Vec4f result = Vec4f(0,0,0,-1);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
@@ -150,18 +97,14 @@ Vec3f PhysicsController::calcReflectionVector(Vec3f direction,Vec3f normal){
 }
 
 void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
-	// TODO: zeitliche Komponente mit einbeziehen
 		Vec3f itemDirection = obj.getDirection();
 		Vec3f itemPosition = obj.getPosition();
 		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
 			obj.addTranslation(itemDirection * speed); 
 			Vec3f newDirection = itemDirection - itemDirection * speedloss;
 			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
-			
 			if(newDirection.length() < minDirectionLengthValue){
 				newDirection = Vec3f(0,0,0);
-			} else {
-				// obj.setLookAt(newDirection);
 			} 
 			obj.setDirection(newDirection[0],newDirection[1],newDirection[2]);
 			MatrixLookAt(itemPosition, itemPosition + obj.getLookAt(), upVector, obj.getTransformation()->editRotation());
@@ -182,12 +125,11 @@ int PhysicsController::didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoo
 	float distance = 0;
     if (iAct->didHit())
     {
-		// NodeRecPtr hitNode = iAct->getHitObject();
 		float minDistance = 10000;
 		Vec3f hitPoint = (iAct->getHitPoint()).subZero();
 		for(int i = 0; i < platforms::count; i++){
 			Vec3f scaledPosition = platforms::positions[i] * general::scale;
-			std::cout << "scaledPosition: " << scaledPosition << " ,offset: " << platforms::offset[1] * 1.5 << "\n";
+			// std::cout << "scaledPosition: " << scaledPosition << " ,offset: " << platforms::offset[1] * 1.5 << "\n";
 			if( obj.getPosition()[1] > scaledPosition[1] - platforms::offset[1] * 1.5 ){ // 
 				distance =  ( hitPoint - scaledPosition ).length();
 				if( distance < minDistance ){
@@ -195,101 +137,9 @@ int PhysicsController::didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoo
 					pltformIndex = i;
 				}
 			}
-			std::cout << "obj position: " << obj.getPosition() << " ,distance: " << distance << " ,platform: " << i << "\n";
+			// std::cout << "obj position: " << obj.getPosition() << " ,distance: " << distance << " ,platform: " << i << "\n";
 		}
-		std::cout << "hit platform: " << pltformIndex << "\n";
+		// std::cout << "hit platform: " << pltformIndex << "\n";
     }
 	return pltformIndex;
 }
-
-// deprecated - use "calculateNewTickForPhysicsObject" instead
-//void PhysicsController::calculateNewTick(){
-//	clock_t now = clock();
-//	clock_t delta = now - startTime;
-//
-//	int newTick = int(static_cast<int>(delta) / 25) % 25;
-//	if(newTick != tick && !model.getMovableItems().empty()){
-//		std::list<VRGPhysicsObject> movObj = model.getMovableItems(); // TODO: Performance upgrade!?
-//		// besser wenn die items einzeln angesprochen werden?
-//		// evtl. sogar als static function ? -> !!!
-//		// Idee: calculateNewTickForObject(VRGPhysicsObject item)
-//		// => nur einen Hook erzeugen und diesen bewegen! => Performance + Memory Verbesserung
-//	for (std::list<VRGPhysicsObject>::iterator it = movObj.begin(); it != movObj.end(); ++it){
-//		VRGPhysicsObject poPtr = (* it);
-//		calculateNewTickForPhysicsObject(poPtr);
-//
-//		/*
-//		Vec3f itemDirection = poPtr.getDirection();
-//		Vec3f itemPosition = poPtr.getPosition();
-//
-//		//if(itemPosition[2] > 0 && itemDirection[2] > 0){
-//		if(itemPosition[heightDimension] > floorValue && itemDirection.length() > 0){ 
-//			if(tick == 0 && false){
-//				std::cout << "object direction: " <<  itemDirection[0] << "," << itemDirection[1] << "," << itemDirection[2] << " - " << now << std::endl;
-//				std::cout << "object position: " <<  itemPosition[0] << "," << itemPosition[1] << "," << itemPosition[2] << " - " << now << std::endl;
-//			}
-//
-//			(* it).addTranslation(itemDirection * speed); 
-//			
-//			Vec3f newDirection = itemDirection - itemDirection * speedloss;
-//			newDirection[heightDimension] = newDirection[heightDimension] - gravity;
-//			if(newDirection.length() < minDirectionLengthValue){
-//				newDirection = Vec3f(0,0,0);
-//			}
-//
-//			poPtr.setDirection(newDirection[0],newDirection[1],newDirection[2]);
-//			if(tick == 0 && false)
-//				std::cout << "new object direction: " <<  newDirection[0] << "," << newDirection[1] << "," << newDirection[2] << " - " << tick << std::endl;
-//
-//			// TODO: Rotation 
-//			// ComponentTransformRecPtr t = ComponentTransformRecPtr ((* it).getTransformation());
-//			// t->setRotation(MatrixLookAtResult(t->editMatrix(),itemPosition, itemPosition + itemDirection, Vec3f(0,0,1)));
-//			MatrixLookAt(itemPosition, itemPosition + itemDirection, upVector, (* it).getTransformation()->editRotation());
-//			
-//		}
-//		*/
-//
-//		/************************** Old Code ******************************/
-//			/*Matrix m = Matrix();
-//			m.setIdentity();
-//			MatrixLookAtResult(m, itemPosition, itemPosition + itemDirection, Vec3f(0,0,1));
-//			Quaternion q; 
-//			Vector3 c = Vector3.Cross(curUp, targetUp); 
-//			float d = Vector3.Dot(curUp, targetUp); 
-//			float s = (float) Math.Sqrt((1.0f + d)*2.0f); 
-//			float rs = 1.0f/s; 
-//			q.X = c.X*rs; 
-//			q.Y = c.Y*rs; 
-//			q.Z = c.Z*rs; 
-//			q.W = s*0.5f; 
-//			
-//			q = q*Rotation; 
-//			
-//			Rotation = Quaternion.Slerp(Rotation, q, 0.1f * distanceScalar); 
-//			*/
-//
-//		// VRGLogger::logMessage("new tick calculated");
-//		// std::cout << "before critical point: if" << std::endl;
-//
-//		// TODO: Hit-Box check!
-//		// if(needCollisionCheck && !didHitAnything((* it))){
-//		//if(float((* it).getPosition().getValues()[2]) > -10.0f){ // TODO: -10 wird nicht der richtige Wert sein!
-//		//	(* it).setDirection(itemDirection.getValues()[0], itemDirection.getValues()[1], itemDirection.getValues()[2] - 1);
-//		//	// TODO: direction �ndern, Schwerkraft
-//		//	// hier wird z value der Direction ge�ndert
-//		//}
-//
-//		/*
-//		if((* it).speed > 0.5)
-//			(* it).setSpeed((* it).speed * 0.5);
-//		else
-//			(* it).setSpeed(0);
-//		*/
-//		// } else {
-//		// TODO
-//		// }
-//		// itemDirection = 0;
-//	}
-//	tick = newTick;
-//	}
-//}

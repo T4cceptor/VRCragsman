@@ -51,7 +51,6 @@ public:
 
 	VRGPhysicsObject createRoot();
 	VRGPhysicsObject createCave();
-	PlattformObject createPlattform(std::string filePath);
 
 	VRGPhysicsObject createHook();
 	VRGPhysicsObject createRope();

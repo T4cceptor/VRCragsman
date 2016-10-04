@@ -165,23 +165,3 @@ VRGPhysicsObject NodeFactory::cloneObjectFromNode(NodeRecPtr node, Vec3f positio
 	returnObj.getTransformation()->setRotation(rotation);
 	return returnObj;
 }
-
-// deprecated, platforms are integrated into the cave geometry
-PlattformObject NodeFactory::createPlattform(std::string filePath){
-	PlattformObject returnObj = * new PlattformObject();
-	NodeRecPtr plattforms = createNodeFromFile(filePath);
-	returnObj.setGeometryNode(plattforms);
-	// Plattform1Only
-	GeometryRecPtr geo = dynamic_cast<Geometry *>(plattforms->getCore());
-	createSharedIndex(geo);
-	// calcFaceNormals(geo);
-	calcVertexNormals(geo);
-
-	ComponentTransformRecPtr compTransform = ComponentTransform::create();
-	returnObj.setTransformation(compTransform);
-
-	NodeRecPtr transNode = makeNodeFor(compTransform);
-	transNode->addChild(plattforms);
-	returnObj.setRootNode(transNode);
-	return returnObj;
-}

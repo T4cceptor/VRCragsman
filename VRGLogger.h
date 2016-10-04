@@ -10,8 +10,6 @@
 class VRGLogger
 {
 public:
-	// VRGLogger(void);
-	// ~VRGLogger(void);
 	static void logMessage(std::string message);
 };
 

@@ -20,10 +20,6 @@ VRGObject GameModel::getPltformRoot(){
 	return platformRoot;
 }
 
-std::list<PlattformObject> GameModel::getPlattforms(){
-	return plattforms;
-}
-
 VRGPhysicsObject GameModel::getPlayer(){
 	return player;
 }

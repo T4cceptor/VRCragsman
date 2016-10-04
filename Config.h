@@ -2,9 +2,11 @@
 #include <string.h>
 #include "OSGColor.h"
 
-namespace config{
-	const int test = 0;
-}
+/* 
+--- General configuration file ---
+- holds every constant value for the game like model paths, positions, scale values ect...
+- gets included in all of the major classes to provide basic, constat value
+*/
 
 namespace path{
 	const std::string caveModel = "../models/Cave10.obj";

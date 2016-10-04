@@ -1,11 +1,15 @@
 #include "GameController.h"
 #include "Config.h"
 
-extern float timeDelta;
 extern void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation);
 
+GameController::GameController(void){ std::cout << "GameController contructor called" << std::endl; }
+GameController::~GameController(void){}
+
 void GameController::resetGame(){
-	// TODO
+	currentPltForm = 0;
+	currentTick = 0;
+	resetGameState(1);
 	std::cout << "Game reset" << std::endl;
 }
 
@@ -15,43 +19,39 @@ void GameController::changeCurrentState(int newState){
 }
 
 void GameController::moveHook(Vec3f direction, float speed){
-	countBounce = 0;
 	count = 0;
-	currentTickCount = 0;
-	tossVector = direction * hook::movementVectorScale * general::scale * speed;
-	prepToStop = false;
-	readyToChangeState = 0;
 	ropeLength = 0;
 	initialDirection = direction * hook::movementVectorScale * general::scale * speed;
 	model->moveHook(
 		ropeOrigin, 
 		initialDirection
-	);
+		);
 }
 
 void GameController::resetRope() {
 	ropeLength = 0;
 	ctrlPnt1 = Vec3f(0,0,0);
-	calculateRopeDirection();
+	ctrlPnt2 = ctrlPnt1;
+	ctrlPnt3 = ctrlPnt1;
+	calculateRopePositions();
 }
 
 void GameController::resetHook(){
 	ropeHitCave = -1;
 	initialDirectionScale = 30;
 	Vec3f newHookPosition = ropeOrigin + Vec3f(100,0,-50);
-	model->getHook().setPosition(newHookPosition);
-	model->getHook().setDirection(Vec3f(0,0,0));
 	Vec3f newLookAt = Vec3f(1,0,-1);
 	float rotation = mgr->getYRotate();
 	newLookAt = Matrix(
 		Vec3f(cos(rotation), 	0, 	-sin(rotation)),
 		Vec3f(0, 		1, 	0),
 		Vec3f(sin(rotation),	0,	cos(rotation))
-	) * newLookAt;
+		) * newLookAt;
+	model->getHook().setPosition(newHookPosition);
+	model->getHook().setDirection(Vec3f(0,0,0));
 	model->getHook().setLookAt(newLookAt);
 	MatrixLookAt(newHookPosition, newLookAt, Vec3f(0,1,0), model->getHook().getTransformation()->editRotation());
 }
-
 
 void GameController::startGame(){
 	changeCurrentState(1);
@@ -63,8 +63,8 @@ void GameController::resetAnchor(){
 }
 
 void GameController::resetGameState(int i){
-	ropeOrigin = platforms::ropeOrigins[currentPltForm] * general::scale;
-	shortestDistanceToCave = 10000;
+	gameState = i;
+	setRopeOrigin(platforms::ropeOrigins[currentPltForm] * general::scale);
 	resetHook();
 	resetAnchor();
 	resetRope();
@@ -109,7 +109,7 @@ Vec3f GameController::calculateNewRopeDirection(){
 	Vec3f from = ropeOrigin;
 	Vec3f at = (ctrlPnt1.length() > 0 && ropeHitCave > 0) ? ctrlPnt1 : model->getHook().getPosition();
 	Vec3f direction = at - from;
-	if(gameState == 2){
+	if(gameState != 1){
 		direction.normalize();
 		return direction;
 	}
@@ -128,8 +128,8 @@ Vec3f GameController::calculateNewRopeDirection(){
 	return newDirection * length;
 }
 
+//checks if point p is below the line(s, e) -> returns -1, on the line -> returns 0, or above the line -> returns 1
 int pointRelationToLine(Vec3f s, Vec3f e, Vec3f p){
-	// p liegt auf y-Achse zwischen s und e UND (entweder auf x-Achse zwischen s und e ODER auf z-Achse zwischen s und e)
 	if((s[1] >= p[1] && e[1] <= p[1]) && 
 		((s[0] >= p[0] && e[0] <= p[0]) || (s[0] < p[0] && e[0] > p[0])) ||
 		((s[2] >= p[2] && e[2] <= p[2]) || (s[2] < p[2] && e[2] > p[2]))
@@ -138,7 +138,6 @@ int pointRelationToLine(Vec3f s, Vec3f e, Vec3f p){
 			v1.normalize();
 			Vec3f v2 = e - p;
 			v2.normalize();
-			// falls v2.y > v1.y => p liegt über der Strecke s->e, falls 0 => p liegt auf s->e, andernfalls darunter
 			if(v2[1] > v1[1]){
 				return 1;
 			} else if(v2[1] < v1[1]){
@@ -150,8 +149,7 @@ int pointRelationToLine(Vec3f s, Vec3f e, Vec3f p){
 	return 0;
 }
 
-void GameController::calculateRopeDirection(){
-	// float shortestDistance = 1000;
+void GameController::calculateRopePositions(){
 	std::list<VRGPhysicsObject> ropePieces = model->getRopeTail();
 	int ropeListSize = ropePieces.size();
 	if(ropeListSize > 0){
@@ -183,7 +181,7 @@ void GameController::calculateRopeDirection(){
 				Vec3f lineStart = currentPosition - currentDirection * 2;
 				Vec3f lineEnd = currentPosition + currentDirection * 2;
 
-				// falls ctrlPnt1 über der Strecke lineStart - lineEnd liegen, so muss die bezierkurve zusätzliche Kontrollpunkte berücksichtigen
+				// if the point ctrlPnt1 lies above the line(lineStart, lineEnd) => the bezier calculation is extended on 3 more control points
 				if(pointRelationToLine(lineStart, lineEnd, ctrlPnt1) == 1){
 					Vec3f distanceVector = lineEnd - lineStart;
 					Line l = Line(currentPosition, distanceVector);
@@ -201,7 +199,6 @@ void GameController::calculateRopeDirection(){
 			}
 
 			float t = 1.0f - float(count) / float(amountOfRopePieces);
-
 			Vec3f bezierPoint0 = lastObjPosition;
 			Vec3f bezierPoint1 = getBezierPoint(p0, p1, p2, p3, t);
 			Vec3f bezierDirection = (bezierPoint0 - bezierPoint1) / 2;
@@ -217,8 +214,7 @@ void GameController::calculateRopeDirection(){
 			if(p3 == ctrlPnt1){
 				lookAt = Vec3f(lastObjPosition[0], lastObjPosition[1] < ctrlPnt1[1] ? ctrlPnt1[1] : lastObjPosition[1], lastObjPosition[2]);
 			}
-
-			MatrixLookAt((* it).getPosition(), lastObjPosition, Vec3f(0,1,0), (* it).getTransformation()->editRotation());
+			MatrixLookAt((* it).getPosition(), lookAt, Vec3f(0,1,0), (* it).getTransformation()->editRotation());
 
 			if(hook.getDirection().length() > 0){
 				ropeLength += scale;
@@ -230,7 +226,7 @@ void GameController::calculateRopeDirection(){
 	}
 }
 
-void GameController::calculateRopeLookAt(){
+void GameController::calculateHookLookAt(){
 	VRGPhysicsObject hook = model->getHook();
 	Vec3f lookAt = hook.getLookAt();
 	Vec3f direction = hook.getDirection();
@@ -248,11 +244,67 @@ void GameController::resetBezier(){
 	ropeHitCave = -1;
 }
 
+void GameController::calculatePlatformTransition(int p){
+	VRGPhysicsObject hook = model->getHook();
+	currentPltForm = p;
+	ctrlPnt1 = Vec3f(0,0,0);
+	Vec3f from = ropeOrigin;
+	Vec3f at = hook.getPosition();
+	Vec3f lookAt =  at - from;
+	hook.setDirection(lookAt);
+	MatrixLookAt(from, hook.getPosition() + lookAt, Vec3f(0,1,0), hook.getTransformation()->editRotation());
+	changeCurrentState(2);
+}
+
+void GameController::calculateRope(){
+	VRGPhysicsObject hook = model->getHook();
+	Vec3f hookDirection = hook.getDirection();
+	Vec3f distanceVector = hook.getPosition() - ropeOrigin;
+	Line l = Line(ropeOrigin, distanceVector);
+	Vec4f overthrow = pCtrl->overthrow(l, model->getCave(), distanceVector.length());
+	hookDirection.normalize();
+	if(overthrow[3] != -1 && ctrlPnt1.length() == 0){ // if overthrow[3] != -1 => overthrow[0-2] = hitPoint
+		if(ropeHitCave == -1)
+			ropeHitCave = model->getRopeTail().size() / 4;
+		ctrlPnt1 = Vec3f(overthrow[0], overthrow[1], overthrow[2]);
+		ctrlPnt2 = ctrlPnt1 + hookDirection;
+		ctrlPnt3 = ctrlPnt1 - hookDirection;
+	}  else if(overthrow[3] == -1 && (ctrlPnt1.length() != 0 || ropeHitCave > 0)){
+		resetBezier();
+	} 
+	calculateHookLookAt();
+	calculateRopePositions();
+}
+
+void GameController::animateHookToNewOrigin(){
+	VRGPhysicsObject hook = model->getHook();
+	resetBezier();
+	Vec3f pltformPosition = platforms::positions[currentPltForm] * general::scale;
+	Vec3f hookPosition = hook.getPosition();
+	Vec3f direction = pltformPosition - hookPosition;
+	Vec3f mgrHook = hookPosition - ropeOrigin;
+	calculateRopePositions();
+	if(direction.length() > physics::minDirectionLengthValue * general::scale){
+		Vec3f tempDirection = direction;
+		tempDirection.normalize();
+		hook.setPosition(hookPosition + tempDirection * 10);
+	} else {
+		hook.setPosition(pltformPosition);
+		mgrHook.normalize();
+		hook.setDirection(mgrHook);
+		hook.setLookAt(mgrHook);
+		MatrixLookAt(hookPosition, hookPosition + mgrHook, Vec3f(0,1,0), hook.getTransformation()->editRotation());
+	}
+	if(direction.length() < physics::minDirectionLengthValue * general::scale){
+		calculateRopePositions();
+		changeCurrentState(3);
+	}
+}
+
 void GameController::callGameLoop(){
 	int newTick = calcNewTick();
 	if(newTick != currentTick){
 		currentTick = newTick;
-		currentTickCount++;
 		VRGPhysicsObject ropeStart = model->getRopeStart();
 		VRGPhysicsObject hook = model->getHook();
 		Vec3f hookPosition = hook.getPosition();
@@ -267,44 +319,13 @@ void GameController::callGameLoop(){
 					if(didHit){
 						int pltformHit = pCtrl->didHitPlatform(hook, model->getPltformRoot());
 						if(pltformHit != -1 && pltformHit == currentPltForm + 1){ // Platform getroffen => Seil spannen
-							currentPltForm = pltformHit;
-							ctrlPnt1 = Vec3f(0,0,0);
-							Vec3f cavePosition = mgr->getTranslation();
-							Vec3f from = ropeOrigin;
-							Vec3f at = hook.getPosition();
-							Vec3f lookAt =  at - from;
-
-							//lookAt.normalize(); // TODO
-
-							hook.setDirection(lookAt);
-							MatrixLookAt(cavePosition, hook.getPosition() + lookAt, Vec3f(0,1,0), hook.getTransformation()->editRotation());
-							changeCurrentState(2);
-						} else {
-							// es wurde nur die Cave getroffen, keine Plattform
-							countBounce++;
+							calculatePlatformTransition(pltformHit);
 						}
 					}
 
 					// test if cave part was overthrown by the hook
-					if(gameState == 1 && hookDirectionLength > 0){ // && !didHit
-						if(!didHit){
-							Vec3f distanceVector = hookPosition - ropeOrigin;
-							Line l = Line(ropeOrigin, distanceVector);
-							Vec4f overthrow = pCtrl->overthrow(l, model->getCave(), distanceVector.length());
-							hookDirection.normalize();
-							if(overthrow[3] != -1 && ctrlPnt1.length() == 0){ // if overthrow[3] != -1 => overthrow[0-2] = hitPoint
-								if(ropeHitCave == -1)
-									ropeHitCave = model->getRopeTail().size() / 4;
-								ctrlPnt1 = Vec3f(overthrow[0], overthrow[1], overthrow[2]);
-								ctrlPnt2 = ctrlPnt1 + hookDirection;
-								ctrlPnt3 = ctrlPnt1 - hookDirection;
-								std::cout << "hit point" << ctrlPnt1 << "\n";
-							}  else if(overthrow[3] == -1 && (ctrlPnt1.length() != 0 || ropeHitCave > 0)){
-								resetBezier();
-							} 
-							calculateRopeDirection();
-							calculateRopeLookAt();
-						}
+					if(!didHit && hookDirectionLength > 0){
+						calculateRope();
 					}
 				}
 			}
@@ -312,63 +333,14 @@ void GameController::callGameLoop(){
 				mgr->setTranslation(mgr->getTranslation() - general::upVector * general::scale);
 			}
 		} else if (gameState == 2){
-			resetBezier();
-			Vec3f pltformPosition = platforms::positions[currentPltForm] * general::scale;
-			Vec3f hookPosition = hook.getPosition();
-			Vec3f direction = pltformPosition - hookPosition;
-			Vec3f mgrHook = hookPosition - ropeOrigin;
-			calculateRopeDirection();
-			if(direction.length() > physics::minDirectionLengthValue * general::scale){
-				Vec3f tempDirection = direction;
-				tempDirection.normalize();
-				hook.setPosition(hookPosition + tempDirection * 10);
-			} else {
-				hook.setPosition(pltformPosition);
-				mgrHook.normalize();
-				hook.setDirection(mgrHook);
-				hook.setLookAt(mgrHook);
-				MatrixLookAt(hookPosition, hookPosition + mgrHook, Vec3f(0,1,0), hook.getTransformation()->editRotation());
-			}
-			if(direction.length() < physics::minDirectionLengthValue * general::scale){
-				calculateRopeDirection();
-				changeCurrentState(3);
-			}
+			animateHookToNewOrigin();
 		} else if (gameState == 3){
-			float movSpeed = 20;
-			if(rightMouseDown){
-				moveTowardsPlattform(-movSpeed);
-			} else if (leftMouseDown){
-				moveTowardsPlattform(movSpeed);
+			if(caveMovement > 0){
+				moveTowardsPlattform(caveMovement);
+				caveMovement = caveMovement * 0.8;
+				if(caveMovement < 0.01)
+					caveMovement = 0;
 			}
-		} 
-
-		// TODO: diese beiden GameStates evtl. rauslassen -> lieber Knopf um Haken + Seil zur�ck zu setzen
-		else if (gameState == 4){ // TODO
-			Vec3f distanceVector = hook.getPosition() - mgr->getTranslation();
-			distanceVector.normalize();
-			float dotProd = abs(distanceVector * Vec3f(0,1,0));
-			// std::cout << "distanceVector: " << distanceVector << " ,dotProd: " << dotProd << "\n";
-			if(dotProd < 0.98) // TODO
-			{
-				Vec3f newDirection = hook.getDirection() - distanceVector;
-				Vec3f newPosition = hook.getPosition() + newDirection;
-				hook.setPosition(newPosition);
-			} else {
-				changeCurrentState(5);
-			}
-		} else if (gameState == 5){
-			// TODO: Hook kommt zum Spieler zur�ck
-			// Problem: Plattform ist im Weg ...
-			// -> korrekte Bewegung nachahmen
-			Vec3f targetPosition = mgr->getTranslation();
-			Vec3f direction = targetPosition - hook.getPosition();
-			if(direction.length() > physics::minDirectionLengthValue * general::scale){
-				hook.setPosition(hook.getPosition() + (direction * 0.02));
-			} else {
-				hook.setDirection(Vec3f(0,0,0));
-				hook.setPosition(targetPosition[0], targetPosition[1], targetPosition[2]);
-				changeCurrentState(1);
-			} 
 		}
 	}
 }
@@ -386,7 +358,6 @@ void GameController::moveTowardsPlattform(float length){
 	} else {
 		ropeOrigin = platforms::positions[currentPltForm];
 		mgr->setTranslation(pltformPosition);
-		// mgr->setYRotate(pltPositions::rotation[currentPltForm]);
 		changeCurrentState(1);
 		resetGameState(1);
 	}
@@ -402,7 +373,7 @@ void GameController::moveTowardsPlattform(Vec3f movementDirection){
 	normMovementDirection.normalize();
 	float dotProd = normDirection * normMovementDirection;
 	float length = (1 - dotProd) * movementDirection.length();
-	moveTowardsPlattform(length);
+	caveMovement += length;
 }
 
 int GameController::calcNewTick(){
@@ -453,14 +424,6 @@ NodeTransitPtr GameController::setupScenegraph(){
 	return model->getScenegraphRoot().getRootNode();
 }
 
-GameController::GameController(void)
-{
-	std::cout << "GameController contructor called" << std::endl;
-}
-
-GameController::~GameController(void)
-{
-}
 
 void GameController::init(OSGCSM::CAVESceneManager* newMgr){
 	mgr = newMgr;
@@ -469,20 +432,17 @@ void GameController::init(OSGCSM::CAVESceneManager* newMgr){
 	model->initGameModel(pCtrl);
 
 	currentTick = 0;
-	readyToChangeState = 0;
 	gameState = 1;
-	startTime = clock();
-	prepToStop = false;
 	currentPltForm = 0;
 	elapsedTime = 0;
-	hookFlying = false;
-	shortestDistanceToCave = 10000;
 
 	initialDirection = Vec3f(0,0,0);
 
 	ctrlPnt1 = Vec3f(0,0,0);
 	ctrlPnt2 = Vec3f(0,0,0);
 	ctrlPnt3 = Vec3f(0,0,0);
+
+	caveMovement = 0;
 
 	ropeLength = 0;
 	ropeOrigin = platforms::ropeOrigins[currentPltForm] * general::scale;

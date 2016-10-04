@@ -1,16 +1,5 @@
 #include "VRGLogger.h"
 
-
-/*
-VRGLogger::VRGLogger(void)
-{
-}
-
-VRGLogger::~VRGLogger(void)
-{
-}
-*/
-
 std::string logFileName = "log.txt";
 
 bool exists_test3 (const std::string& name) {

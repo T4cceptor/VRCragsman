@@ -1,6 +1,5 @@
 //#pragma once
 #include "NodeFactory.h"
-#include "PlattformObject.h"
 #include "PhysicsController.h"
 #include <OSGNode.h>
 #include <OSGSimpleGeometry.h>
@@ -27,7 +26,6 @@ public:
 	VRGPhysicsObject getRopeStart();
 	VRGPhysicsObject getAnchor();
 	std::list<VRGPhysicsObject> getRopeTail();
-	std::list<PlattformObject> getPlattforms();
 	std::list<VRGPhysicsObject> getIcicles();
 	VRGPhysicsObject createNewHook(Pnt3f pos, Vec3f direction);
 	void moveHook(Pnt3f pos, Vec3f direction);
@@ -69,8 +67,6 @@ private:
 	VRGPhysicsObject ropeStart;
 	std::list<VRGPhysicsObject> ropePieces; // evtl. durch eigene Klasse beschreiben
 	std::list<VRGPhysicsObject> icicles; // evtl. durch eigene Klasse beschreiben
-	PlattformObject currentPlattform;
-	std::list<PlattformObject> plattforms;
 	VRGPhysicsObject allPlattforms;
 
 };
