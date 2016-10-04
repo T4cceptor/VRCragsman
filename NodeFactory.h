@@ -56,6 +56,13 @@ public:
 	VRGPhysicsObject createHook();
 	VRGPhysicsObject createRope();
 	VRGPhysicsObject createAnchor();
+	VRGPhysicsObject createNewIcicle(Vec3f position, float scale);
+	VRGPhysicsObject createStalactites(Vec3f position);
+	VRGPhysicsObject createObject(std::string path);
+	VRGPhysicsObject createPebble(Vec3f position);
+	VRGPhysicsObject createObjectFromPath(std::string path, Vec3f position, Vec3f scale);
+	VRGPhysicsObject cloneObjectFromNode(NodeRecPtr node, Vec3f position, Vec3f scale);
+	VRGPhysicsObject cloneObjectFromNode(NodeRecPtr node, Vec3f position, Vec3f scale, Quaternion rotation);
 
 	NodeTransitPtr createNewLight(Pnt3f position, NodeRecPtr root);
 
@@ -64,6 +71,10 @@ public:
 	VRGPhysicsObject createRopePiece();
 
 	NodeRecPtr ropeBlueprint;
+	NodeRecPtr icicleBlueprint;
+	NodeRecPtr stalactitesBlueprint;
+	NodeRecPtr pebbleBlueprint;
+	NodeRecPtr pebble2Blueprint;
 
 	void initNodeFactory();
 };

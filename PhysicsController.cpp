@@ -67,7 +67,7 @@ void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion
 		rotation = q1 * q2;
 }
 
-bool PhysicsController::collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2){
+bool PhysicsController::collision(VRGPhysicsObject obj1, VRGObject obj2){
 	Vec3f direction = obj1.getDirection();
 	float directionLength = direction.length() * speed;
 	direction.normalize();
@@ -122,7 +122,7 @@ bool PhysicsController::pointInsideObj(Vec3f point, VRGPhysicsObject obj){
 	return true;
 }
 
-Vec4f PhysicsController::overthrow(Line line, VRGPhysicsObject obj, float length){
+Vec4f PhysicsController::overthrow(Line line, VRGObject obj, float length){
 	Vec4f result = Vec4f(0,0,0,-1);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	if(length == -1)
@@ -168,15 +168,38 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 		}
 }
 
-int PhysicsController::didHitPLattform(VRGPhysicsObject obj){
-	for(int i = 0; i < pltPositions::size; i++){
-		Vec3f scaledPosition = pltPositions::positions[i] * general::scale;
-		float distance =  (obj.getPosition() - scaledPosition).length();
-		if(abs(obj.getPosition()[1] - scaledPosition[1]) < general::plattformHitDistance * general::scale / 5 && distance < general::plattformHitDistance * general::scale){
-			return i;
+int PhysicsController::didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoot){
+	// Vec3f direction = obj.getDirection();
+	Vec3f direction = Vec3f(0, -40, 0);
+	float directionLength = direction.length() * speed;
+	direction.normalize();
+	Line ray = Line(obj.getPosition(), direction);
+	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
+	iAct->setLine(ray, directionLength); 
+	NodeRefPtr someNode = pltformRoot.getRootNode();
+	iAct->apply((Node * const)someNode);
+	int pltformIndex = -1;
+	float distance = 0;
+    if (iAct->didHit())
+    {
+		// NodeRecPtr hitNode = iAct->getHitObject();
+		float minDistance = 10000;
+		Vec3f hitPoint = (iAct->getHitPoint()).subZero();
+		for(int i = 0; i < platforms::count; i++){
+			Vec3f scaledPosition = platforms::positions[i] * general::scale;
+			std::cout << "scaledPosition: " << scaledPosition << " ,offset: " << platforms::offset[1] * 1.5 << "\n";
+			if( obj.getPosition()[1] > scaledPosition[1] - platforms::offset[1] * 1.5 ){ // 
+				distance =  ( hitPoint - scaledPosition ).length();
+				if( distance < minDistance ){
+					minDistance = distance;
+					pltformIndex = i;
+				}
+			}
+			std::cout << "obj position: " << obj.getPosition() << " ,distance: " << distance << " ,platform: " << i << "\n";
 		}
-	}
-	return -1;
+		std::cout << "hit platform: " << pltformIndex << "\n";
+    }
+	return pltformIndex;
 }
 
 // deprecated - use "calculateNewTickForPhysicsObject" instead

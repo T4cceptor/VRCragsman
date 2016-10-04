@@ -2,30 +2,22 @@
 #include <math.h>
 #include "Config.h"
 
+GameModel::GameModel(void){ std::cout << "GameModel contructor called" << std::endl; }
+GameModel::~GameModel(void){}
 
-GameModel::GameModel(void)
-{
-	std::cout << "GameModel contructor called" << std::endl;
-}
-
-/* TODO Parameter f�r Start �bergeben - ?
-GameModel::GameModel(void)
-{
-
-}
-*/
-
-GameModel::~GameModel(void)
-{
-}
+extern void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation);
 
 /** GETTER **/
 VRGObject GameModel::getScenegraphRoot(){
 	return root;
 }
 
-VRGPhysicsObject GameModel::getCave(){
-	return cave;
+VRGObject GameModel::getCave(){
+	return caveRoot;
+}
+
+VRGObject GameModel::getPltformRoot(){
+	return platformRoot;
 }
 
 std::list<PlattformObject> GameModel::getPlattforms(){
@@ -50,31 +42,9 @@ std::list<VRGPhysicsObject> GameModel::getRopeTail(){
 	return ropePieces;
 }
 
-/* // TODO
-VRGPhysicsObject GameModel::getRopePieceWithId(){
-	VRGPhysicsObject result;
-	for (std::list<VRGPhysicsObject>::iterator it = ropePieces.begin(); it != ropePieces.end(); it++){
-		if(it->)
-	}
-	return 
-}
-*/
-
 std::list<VRGPhysicsObject> GameModel::getIcicles(){
 	return icicles;
 }
-
-/* // TODO
-VRGPhysicsObject GameModel::getIcicleWithId(){
-
-}
-*/
-
-/* // TODO
-PlattformObject GameModel::getPlattformWithId(){
-
-}
-*/
 
 /** Initialize Model and create Scenegraph functions **/
 void GameModel::initGameModel(PhysicsController * pc){
@@ -82,8 +52,6 @@ void GameModel::initGameModel(PhysicsController * pc){
 	nf.initNodeFactory();
 	physicCtrl = *pc;
 }
-
-extern void MatrixLookAt(OSG::Pnt3f from, OSG::Pnt3f at, OSG::Vec3f up, OSG::Quaternion& rotation);
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
@@ -133,6 +101,75 @@ void GameModel::setupLights(){
 	}
 }
 
+void GameModel::setupIcicles(){
+	int count = icicles::positionsSize;
+	VRGObject rNode = caveRoot;
+	for(int i = 0; i < count; i++){
+		VRGPhysicsObject newIcicle = nf.createNewIcicle(icicles::positions[i], 1);
+		rNode.addChild(newIcicle);
+	}
+}
+
+void GameModel::setupStalactites(){
+	int count = stalactites::positionsSize;
+	VRGObject rNode = caveRoot;
+	for(int i = 0; i < count; i++){
+		VRGPhysicsObject newStalac = nf.createStalactites(stalactites::positions[i]);
+		rNode.addChild(newStalac);
+	}
+}
+
+void GameModel::setupSpecialObjs(){
+	int count = specialObjs::count;
+	VRGObject rNode = caveRoot;
+	for(int i = 0; i < count; i++){
+		VRGPhysicsObject newStalac = nf.createObjectFromPath(specialObjs::paths[i], Vec3f(1,1,1), specialObjs::scaleVector * general::scale);
+		rNode.addChild(newStalac);
+	}
+}
+
+void GameModel::setupPltforms(){
+	int count = platforms::count;
+	VRGObject rNode = platformRoot;
+	for(int i = 0; i < count; i++){
+		VRGPhysicsObject newStalac = nf.createObjectFromPath(platforms::paths[i], Vec3f(0,0,0), platforms::scaleVector * general::scale);
+		rNode.addChild(newStalac);
+	}
+	caveRoot.addChild(platformRoot);
+}
+
+void GameModel::setupPebbleGroup1(){
+	int count = pebble::positionsSize;
+	VRGObject rNode = caveRoot;
+	for(int i = 0; i < count; i++){
+		VRGPhysicsObject newStalac = nf.createPebble(pebble::positions[i]);
+		rNode.addChild(newStalac);
+	}
+
+	count = pebble::positionsSize2;
+	for(int i = 0; i < count; i++){
+		int randNum = rand()%(360) + 1;
+		std::cout << "random rotation: " << randNum << "\n";
+		Quaternion rotation = Quaternion(Vec3f(0,1,0), osgDegree2Rad(randNum));
+		VRGPhysicsObject newStalac = nf.cloneObjectFromNode(
+			nf.pebble2Blueprint, 
+			pebble::positions2[i] * general::scale, 
+			pebble::scaleVector * general::scale * 0.8,
+			rotation
+			);
+		rNode.addChild(newStalac);
+	}
+}
+
+void GameModel::setupAdditionalMeshes(){
+	setupStalactites();
+	// setupIcicles();
+	setupPebbleGroup1();
+	setupSpecialObjs();
+
+	// random number: int randNum = rand()%(max-min + 1) + min;
+}
+
 void GameModel::createScenegraph(){
 	// scenegraph root	
 	root = nf.createRoot();
@@ -142,36 +179,30 @@ void GameModel::createScenegraph(){
 	lightTopPtr->setCore(Group::create());
 	staticCaveLights = * new std::list<NodeRecPtr>();
 	lightedScene = nf.createEmptyVRGObj();
+	platformRoot = nf.createEmptyVRGObj();
+	caveRoot = nf.createEmptyVRGObj();
+	lightedScene.addChild(caveRoot);
 
 	// light setup
 	setupLights();
 
 	cave = nf.createCave();
-	lightedScene.addChild(cave.getRootNode());
+	caveRoot.addChild(cave.getRootNode());
+	setupAdditionalMeshes();
+	setupPltforms();
 
 	hook = createNewHook(Pnt3f(0,0,0), Vec3f(0,-1,0));
 	lightedScene.addChild(hook);
 
-
-	// createDeepCopy !!
-	// ropeStart = nf.createRopePiece();
-	// lightedScene.addChild(ropeStart);
-
 	for(int i = 0; i < rope::pieces; i++){
 		ropePieces.push_back(nf.createRopePiece());
 	}
-
 	for (std::list<VRGPhysicsObject>::iterator it=ropePieces.begin(); it != ropePieces.end(); ++it){
 		lightedScene.addChild((* it).getRootNode());
 	}
 
 	anchor = nf.createAnchor();
 	lightedScene.addChild(anchor);
-
-
-	// TODO init icicles / rocks
-	// TODO init stuff
-	
 }
 
 void GameModel::createRopePiece(){

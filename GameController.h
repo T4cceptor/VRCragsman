@@ -38,6 +38,11 @@ public:
 	void jumpToPreviousPlattform();
 
 	void setRopeOrigin(Vec3f newOrigin);
+	void moveTowardsPlattform(float length);
+	void moveTowardsPlattform(Vec3f movementDirection);
+
+	bool rightMouseDown;
+	bool leftMouseDown;
 
 private:
 	GameModel * model;
@@ -61,8 +66,6 @@ private:
 	int calcNewTick();
 	void changeCurrentState(int newState);
 	void jumpToPltForm(int i);
-
-	void moveTowardsPlattform();
 
 	int count;
 	int currentTickCount;

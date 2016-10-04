@@ -20,7 +20,8 @@ public:
 
 	// Getters
 	VRGObject getScenegraphRoot();
-	VRGPhysicsObject getCave();
+	VRGObject getCave();
+	VRGObject getPltformRoot();
 	VRGPhysicsObject getPlayer();
 	VRGPhysicsObject getHook();
 	VRGPhysicsObject getRopeStart();
@@ -28,9 +29,6 @@ public:
 	std::list<VRGPhysicsObject> getRopeTail();
 	std::list<PlattformObject> getPlattforms();
 	std::list<VRGPhysicsObject> getIcicles();
-	// PlattformObject getPlattformWithId();
-	// VRGPhysicsObject getRopePieceWithId();
-	// VRGPhysicsObject getIcicleWithId();
 	VRGPhysicsObject createNewHook(Pnt3f pos, Vec3f direction);
 	void moveHook(Pnt3f pos, Vec3f direction);
 
@@ -44,11 +42,15 @@ public:
 
 
 private:
-	// Init
-	// TODO
 	int gameState;
 
 	void setupLights();
+	void setupIcicles();
+	void setupAdditionalMeshes();
+	void setupStalactites();
+	void setupSpecialObjs();
+	void setupPebbleGroup1();
+	void setupPltforms();
 
 	// Game Objects
 	NodeFactory nf;
@@ -57,11 +59,13 @@ private:
 	VRGPhysicsObject player;
 	VRGPhysicsObject hook;
 	VRGPhysicsObject anchor;
+	VRGObject caveRoot;
+	VRGObject platformRoot;
+	VRGObject lightedScene;
 
 	NodeRecPtr lightTopPtr;
 	std::list<NodeRecPtr> staticCaveLights;
-	VRGObject lightedScene;
-
+	
 	VRGPhysicsObject ropeStart;
 	std::list<VRGPhysicsObject> ropePieces; // evtl. durch eigene Klasse beschreiben
 	std::list<VRGPhysicsObject> icicles; // evtl. durch eigene Klasse beschreiben

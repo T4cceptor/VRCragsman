@@ -18,12 +18,12 @@ public:
 
 	void calculateNewTickForPhysicsObject(VRGPhysicsObject obj);
 
-	bool collision(VRGPhysicsObject obj1, VRGPhysicsObject obj2);
+	bool collision(VRGPhysicsObject obj1, VRGObject obj2);
 	bool distance(VRGPhysicsObject& obj1, VRGPhysicsObject& obj2);
 
-	int didHitPLattform(VRGPhysicsObject obj);
+	int didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoot);
 
-	Vec4f overthrow(Line line, VRGPhysicsObject obj, float length);
+	Vec4f overthrow(Line line, VRGObject obj, float length);
 	bool pointInsideObj(Vec3f point, VRGPhysicsObject obj);
 
 	Vec3f getReflectionVector();
