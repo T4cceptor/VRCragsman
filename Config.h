@@ -117,7 +117,7 @@ namespace pebble{
 	const Vec3f scaleVector = Vec3f(1, 1, 1) * scale;
 	const int offsetScale = 40;
 
-	const int positionsSize = 17;
+	const int positionsSize = 16;
 	const Vec3f positions[positionsSize] = { 
 		Vec3f(-4.1972, -2.12707, -26.92875) * offsetScale ,
 		Vec3f(-8.82521, 1.95082, -63.77443) * offsetScale ,
@@ -133,7 +133,7 @@ namespace pebble{
 		Vec3f(-112.19285, 9.05937, -79.82671) * offsetScale,
 		Vec3f(-115.4119, -22.89444, -96.5978) * offsetScale,
 		Vec3f(-117.42213, -17.14842, -152.59164) * offsetScale,
-		Vec3f(-127.93298, -7.69315, -100.61451) * offsetScale,
+		//Vec3f(-127.93298, -7.69315, -100.61451) * offsetScale,
 		Vec3f(-144.0442, 4.76495, -155.38074) * offsetScale,
 		Vec3f(-180.99635, 6.3054, 133.76112) * offsetScale
 	};
@@ -155,7 +155,7 @@ namespace pebble{
 }
 
 namespace specialObjs{
-	const int count = 4;
+	const int count = 6;
 	const int scale = 40;
 	const Vec3f scaleVector = Vec3f(1, 1, 1) * scale;
 	const Vec3f offset1 = Vec3f(0,20,0); 
@@ -163,7 +163,9 @@ namespace specialObjs{
 		"../models/stalactites2.obj",
 		"../models/pebble1.obj",
 		"../models/special1.obj",
-		"../models/special2.obj"
+		"../models/special2.obj",
+		"../models/special3.obj",
+		"../models/special4.obj"
 	};
 }
 
