@@ -69,7 +69,7 @@ bool PhysicsController::collision(VRGPhysicsObject obj1, VRGObject obj2){
 	return false;
 }
 
-Vec4f PhysicsController::overthrow(Line line, VRGObject obj, float length){
+Vec4f PhysicsController::overthrow(Line line, VRGObject obj, float length = -1){
 	Vec4f result = Vec4f(0,0,0,-1);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
 	if(length == -1)
@@ -114,7 +114,7 @@ void PhysicsController::calculateNewTickForPhysicsObject(VRGPhysicsObject obj){
 int PhysicsController::didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoot){
 	// Vec3f direction = obj.getDirection();
 	Vec3f direction = Vec3f(0, -40, 0);
-	float directionLength = direction.length() * speed;
+	float directionLength = direction.length();
 	direction.normalize();
 	Line ray = Line(obj.getPosition(), direction);
 	IntersectActionRefPtr iAct = (IntersectActionRefPtr)IntersectAction::create();
@@ -129,17 +129,12 @@ int PhysicsController::didHitPlatform(VRGPhysicsObject obj, VRGObject pltformRoo
 		Vec3f hitPoint = (iAct->getHitPoint()).subZero();
 		for(int i = 0; i < platforms::count; i++){
 			Vec3f scaledPosition = platforms::positions[i] * general::scale;
-			// std::cout << "scaledPosition: " << scaledPosition << " ,offset: " << platforms::offset[1] * 1.5 << "\n";
-			if( obj.getPosition()[1] > scaledPosition[1] - platforms::offset[1] * 1.5 ){ // 
 				distance =  ( hitPoint - scaledPosition ).length();
 				if( distance < minDistance ){
 					minDistance = distance;
 					pltformIndex = i;
 				}
-			}
-			// std::cout << "obj position: " << obj.getPosition() << " ,distance: " << distance << " ,platform: " << i << "\n";
 		}
-		// std::cout << "hit platform: " << pltformIndex << "\n";
     }
 	return pltformIndex;
 }

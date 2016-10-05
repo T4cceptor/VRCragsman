@@ -10,7 +10,7 @@
 
 namespace path{
 	const std::string caveModel = "../models/Cave10.obj";
-	const std::string hookModel = "../models/hookwithknot3.obj";
+	const std::string hookModel = "../models/newHook1.obj";
 	const std::string ropeModel = "../models/ropeonly.obj";
 	const std::string anchorModel = "../models/Anker.obj";
 	const std::string icicleModel = "../models/BasicIcicle1Only.obj";
@@ -82,7 +82,7 @@ namespace icicles{
 namespace stalactites{
 	const int scale = 40;
 	const Vec3f scaleVector = Vec3f(1, 1, 1) * scale;
-	const int positionsSize = 22;
+	const int positionsSize = 24;
 	const int offsetScale = 40;
 	const Vec3f positions[positionsSize] = { 
 		Vec3f(-12, 31, -6) * offsetScale ,
@@ -102,6 +102,8 @@ namespace stalactites{
 		Vec3f(-24.0337, 17.21975, -54.02957) * offsetScale,
 		Vec3f(-60.0996, 28.96903, -44.41283) * offsetScale,
 		Vec3f(-85.53035, 26.23298, -57.87487) * offsetScale,
+		Vec3f(-107.18052, 18.18429, -68.92303) * offsetScale,
+		Vec3f(-105.40238, 20.19982, -60.09451) * offsetScale,
 		Vec3f(-151.34204, 21.16491, -131.65057) * offsetScale,
 		Vec3f(-142.69237, 12.07856, -143.71127) * offsetScale,
 		Vec3f(-175.76003, 50.14698, -222.00285) * offsetScale,
@@ -153,13 +155,15 @@ namespace pebble{
 }
 
 namespace specialObjs{
-	const int count = 3;
+	const int count = 4;
 	const int scale = 40;
 	const Vec3f scaleVector = Vec3f(1, 1, 1) * scale;
+	const Vec3f offset1 = Vec3f(0,20,0); 
 	const std::string paths[count] = {
 		"../models/stalactites2.obj",
 		"../models/pebble1.obj",
-		"../models/meshes2.obj"
+		"../models/special1.obj",
+		"../models/special2.obj"
 	};
 }
 

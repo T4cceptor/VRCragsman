@@ -119,7 +119,7 @@ void GameModel::setupSpecialObjs(){
 	int count = specialObjs::count;
 	VRGObject rNode = caveRoot;
 	for(int i = 0; i < count; i++){
-		VRGPhysicsObject newStalac = nf.createObjectFromPath(specialObjs::paths[i], Vec3f(1,1,1), specialObjs::scaleVector * general::scale);
+		VRGPhysicsObject newStalac = nf.createObjectFromPath(specialObjs::paths[i], Vec3f(0,0,0), specialObjs::scaleVector * general::scale);
 		rNode.addChild(newStalac);
 	}
 }
@@ -145,7 +145,6 @@ void GameModel::setupPebbleGroup1(){
 	count = pebble::positionsSize2;
 	for(int i = 0; i < count; i++){
 		int randNum = rand()%(360) + 1;
-		std::cout << "random rotation: " << randNum << "\n";
 		Quaternion rotation = Quaternion(Vec3f(0,1,0), osgDegree2Rad(randNum));
 		VRGPhysicsObject newStalac = nf.cloneObjectFromNode(
 			nf.pebble2Blueprint, 
