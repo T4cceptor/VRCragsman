@@ -128,7 +128,6 @@ Vec3f GameController::calculateNewRopeDirection(){
 	Vec3f newDirection = Vec3f(direction[0], 0, direction[2]) + rope::gravityVector + intialPortion;
 	newDirection = Vec3f(newDirection[0], newDirection[1] < ropeOrigin[1] ? ropeOrigin[1] : newDirection[1], newDirection[2]);
 	newDirection.normalize();
-	return newDirection * length * 0.9;
 }
 
 //checks if point p is below the line(s, e) -> returns -1, on the line -> returns 0, or above the line -> returns 1
